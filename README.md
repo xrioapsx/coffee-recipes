@@ -47,18 +47,8 @@ loads as-is. A different browser or domain starts empty.
 
 ## Deploy
 
-The site is hosted on **Cloudflare Pages**, which keeps the GitHub repo private
-and costs nothing. Cloudflare builds and publishes on every push to `main`.
-GitHub Actions (`.github/workflows/ci.yml`) runs the tests and build on every
-push and pull request.
+Live at **https://xrioapsx.github.io/coffee-recipes/**
 
-One-time setup in the Cloudflare dashboard:
-
-1. **Workers & Pages → Create → Pages → Connect to Git**, then authorise GitHub
-   and pick `xrioapsx/coffee-recipes`. Granting access to this repo only is enough.
-2. Build settings:
-   - Framework preset: **None** (or Vite)
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-   - Environment variable: `NODE_VERSION` = `22`
-3. **Save and Deploy.** The site appears at `https://<project-name>.pages.dev`.
+`.github/workflows/deploy.yml` runs the tests and build on every push and pull
+request, and publishes to GitHub Pages on every push to `main`. Pages is set to
+build from **GitHub Actions** in the repo settings.
