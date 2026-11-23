@@ -192,6 +192,65 @@ const HOFFMANN_RECIPES: BrewRecipe[] = [
       };
     },
   },
+  {
+    id: 'shakerato',
+    name: 'Caffè shakerato',
+    tag: 'espresso shaken with syrup and ice',
+    input: { label: 'Espresso (g)', def: 40, min: 20, max: 160, step: 5 },
+    build: (e) => {
+      const syrup = e / 4;
+      const drops = Math.max(1, Math.round(e / 20));
+      return {
+        facts: [
+          ['Espresso', 'A double shot is about 40 g'],
+          ['Syrup', '1:1 simple syrup: equal weights of sugar and water'],
+          ['Equipment', 'Cocktail shaker and a chilled glass'],
+        ],
+        rows: [
+          ['Espresso', fmt(e) + ' g'],
+          ['Simple syrup', fmt(syrup) + ' g'],
+          ['Saline (salt water)', drops + (drops === 1 ? ' drop' : ' drops')],
+          ['Ice', 'A shaker full. The amount is not given.'],
+        ],
+        steps: [
+          ['Chill', 'Put a glass in the freezer or fill it with ice water while you prepare.'],
+          ['Shaker', 'Add ' + fmt(syrup) + ' g of syrup, ' + drops + (drops === 1 ? ' drop' : ' drops') + ' of saline and the ice to the shaker.'],
+          ['Pour', 'Pull ' + fmt(e) + ' g of espresso and pour it straight over the ice.'],
+          ['Shake', 'Swirl, then shake hard for about 30 seconds.'],
+          ['Serve', 'Strain into the chilled glass. The foam on top is the point.'],
+        ],
+        note:
+          'His fruity variation uses about 36 g of a light, fruity espresso, 12 g of Earl Grey syrup, 2 drops of saline and 0.2 g of orange bitters. Honey syrup in place of simple syrup gets you close to your own coffee honey drink.',
+      };
+    },
+  },
+  {
+    id: 'tonic',
+    name: 'Espresso tonic',
+    tag: 'about 1:3 espresso to tonic',
+    input: { label: 'Tonic water (g)', def: 120, min: 60, max: 480, step: 10 },
+    build: (t) => {
+      const lo = (t * 35) / 120;
+      const hi = (t * 40) / 120;
+      return {
+        facts: [
+          ['Tonic', 'Shop-bought is fine. He also makes his own from cinchona bark.'],
+          ['Coffee', 'Fruity, washed coffees suit it best'],
+          ['Glass', 'Tall, with plenty of ice'],
+        ],
+        rows: [
+          ['Tonic water', fmt(t) + ' g'],
+          ['Espresso', fmt(lo) + '–' + fmt(hi) + ' g'],
+        ],
+        steps: [
+          ['Ice', 'Fill the glass with ice.'],
+          ['Tonic', 'Pour in ' + fmt(t) + ' g of cold tonic.'],
+          ['Espresso', 'Add ' + fmt(lo) + ' to ' + fmt(hi) + ' g of espresso on top, or serve it on the side.'],
+          ['Serve', 'Stir, swirl or leave it layered, as you like.'],
+        ],
+      };
+    },
+  },
 ];
 
 /** Split a total into pours by their share of a reference total, plus running totals. */
@@ -310,6 +369,149 @@ const WINTON_RECIPES: BrewRecipe[] = [
   },
 ];
 
+const SASAKI_RECIPES: BrewRecipe[] = [
+  {
+    id: 'sasaki-2014',
+    name: '2014 winning AeroPress',
+    tag: 'about 1:15, 78°C, slow press',
+    input: { label: 'Water (g)', def: 250, min: 150, max: 300, step: 10 },
+    build: (w) => {
+      const c = (w * 16.5) / 250;
+      const bloom = (w * 40) / 250;
+      const main = (w * 210) / 250;
+      const leave = (w * 45) / 250;
+      return {
+        facts: [
+          ['Grind', 'EK43 at 9.5 in competition, around medium'],
+          ['Water', '78°C, soft mineral water'],
+          ['Brewer', 'AeroPress, standard position, rinsed paper filter'],
+        ],
+        rows: [
+          ['Coffee', fmt(c) + ' g'],
+          ['Bloom water', fmt(bloom) + ' g'],
+          ['Then add', fmt(main) + ' g'],
+          ['Leave in the chamber', 'about ' + fmt(leave) + ' g'],
+        ],
+        steps: [
+          ['Prep', 'Rinse a paper filter and set the AeroPress up the normal way. Add ' + fmt(c) + ' g of coffee.'],
+          ['0:00', 'Pour ' + fmt(bloom) + ' g of water at 78°C and stir 5 times.'],
+          ['0:25', 'Add ' + fmt(main) + ' g more water and stir once.'],
+          ['Press', 'Press very slowly, taking about 75 seconds.'],
+          ['Stop', 'Stop with about ' + fmt(leave) + ' g still in the chamber. The last part tastes harsh.'],
+        ],
+      };
+    },
+  },
+];
+
+const GARAY_RECIPES: BrewRecipe[] = [
+  {
+    id: 'garay-2018',
+    name: '2018 winning AeroPress',
+    tag: 'strong concentrate, then diluted',
+    input: { label: 'Total water (g)', def: 200, min: 120, max: 240, step: 10 },
+    build: (w) => {
+      const c = (w * 34.9) / 200;
+      const brew = w * 0.5;
+      const hot = w * 0.3;
+      const room = w * 0.2;
+      return {
+        facts: [
+          ['Grind', 'EK43S at 8 in competition, around medium-fine'],
+          ['Water', '85°C, Brita-filtered'],
+          ['Brewer', 'AeroPress inverted, rinsed paper filter'],
+        ],
+        rows: [
+          ['Coffee', fmt(c) + ' g'],
+          ['Brew water', fmt(brew) + ' g'],
+          ['Top up, hot', fmt(hot) + ' g'],
+          ['Top up, room temperature', fmt(room) + ' g'],
+        ],
+        steps: [
+          ['Prep', 'Set the AeroPress upside down, rinse the filter, grind ' + fmt(c) + ' g of coffee.'],
+          ['0:00', 'Pour ' + fmt(brew) + ' g of water at 85°C over about 30 seconds.'],
+          ['0:30', 'Stir firmly but carefully with chopsticks for 30 seconds.'],
+          ['1:00', 'Cap it, flip it onto a server that is not preheated, and press for 30 seconds.'],
+          ['Top up', 'Add ' + fmt(hot) + ' g of 85°C water and ' + fmt(room) + ' g of room-temperature water.'],
+        ],
+      };
+    },
+  },
+];
+
+const LITTLE_RECIPES: BrewRecipe[] = [
+  {
+    id: 'little-2022',
+    name: '2022 winning AeroPress',
+    tag: 'concentrate onto cold water, then bypass',
+    input: { label: 'Finished drink (g)', def: 150, min: 100, max: 200, step: 10 },
+    build: (t) => {
+      const c = (t * 18) / 150;
+      const cold = (t * 20) / 150;
+      const brew = (t * 94) / 150;
+      return {
+        facts: [
+          ['Grind', 'Very coarse with fines sifted out, or EK43 at 10 without sifting'],
+          ['Water', '92°C to brew, 90°C to top up'],
+          ['Brewer', 'AeroPress, standard position, one unrinsed paper filter'],
+        ],
+        rows: [
+          ['Coffee', fmt(c) + ' g'],
+          ['Cold water in the server', fmt(cold) + ' g'],
+          ['Brew water', fmt(brew) + ' g'],
+          ['Top up with hot water to', fmt(t) + ' g'],
+        ],
+        steps: [
+          ['Prep', 'Put ' + fmt(cold) + ' g of cold water in the server. It stops the extraction as the coffee lands.'],
+          ['0:00', 'Add ' + fmt(c) + ' g of coffee, pour ' + fmt(brew) + ' g of 92°C water and stir gently 12 times.'],
+          ['1:20', 'Set the plunger on top.'],
+          ['1:30', 'Press gently.'],
+          ['Top up', 'Add 90°C water until the drink weighs ' + fmt(t) + ' g.'],
+        ],
+        note: 'In competition she ground twice, very coarse then on a second grinder, and sifted out the finest dust. One grinder on a coarse setting is a fair start at home.',
+      };
+    },
+  },
+];
+
+const WIPVASUTTI_RECIPES: BrewRecipe[] = [
+  {
+    id: 'wipvasutti-2023',
+    name: '2023 winning AeroPress',
+    tag: 'two-stage dose, cool and hot bypass',
+    input: { label: 'Finished drink (g)', def: 155, min: 100, max: 200, step: 5 },
+    build: (t) => {
+      const c1 = (t * 16) / 155;
+      const c2 = (t * 2) / 155;
+      const brew = (t * 100) / 155;
+      const cool = (t * 115) / 155;
+      return {
+        facts: [
+          ['Grind', 'Fine-medium, French press range (1Zpresso ZP6 at 65 clicks)'],
+          ['Water', '89°C, mineralised coffee water'],
+          ['Brewer', 'AeroPress inverted, rinsed paper filter'],
+        ],
+        rows: [
+          ['Coffee, first dose', fmt(c1) + ' g'],
+          ['Coffee, second dose', fmt(c2) + ' g'],
+          ['Brew water', fmt(brew) + ' g'],
+          ['Top up, room temperature, to', fmt(cool) + ' g'],
+          ['Top up, hot, to', fmt(t) + ' g'],
+        ],
+        steps: [
+          ['0:00', 'With the AeroPress upside down, add ' + fmt(c1) + ' g of coffee and pour ' + fmt(brew) + ' g of 89°C water.'],
+          ['0:30', 'Stir with one end of a chopstick for 5 seconds.'],
+          ['0:45', 'Add the second ' + fmt(c2) + ' g of coffee.'],
+          ['0:55', 'Stir for another 5 seconds. Push the plunger up to clear the air, then cap it.'],
+          ['1:35', 'Flip carefully and press for about 30 seconds.'],
+          ['Top up', 'Add room-temperature water to ' + fmt(cool) + ' g, then hot water to ' + fmt(t) + ' g.'],
+        ],
+        note: 'The late second dose is how he fixed the strength. Competition brews are tuned to one coffee, so taste and adjust.',
+      };
+    },
+  },
+];
+
 export const BARISTAS: Barista[] = [
   {
     id: 'hoffmann',
@@ -317,12 +519,12 @@ export const BARISTAS: Barista[] = [
     title: 'World Barista Champion 2007',
     intro: [
       {
-        lead: 'Closest to a shaken iced drink: the immersion iced coffee.',
-        text: 'Hoffmann brews strong coffee hot and presses it straight onto ice, so the melting ice does the diluting. A shaker works the same way, which is why the calculator counts ice melt.',
+        lead: 'Closest to your coffee honey: the caffè shakerato.',
+        text: 'Espresso and syrup shaken hard with ice, the Italian original of your own drink. His immersion iced coffee is close too: strong coffee pressed straight onto ice, so the melting ice does the diluting, which is why the calculator counts ice melt.',
       },
       { text: 'Pick a recipe, then change the water to scale everything else in it.' },
     ],
-    sourceNote: "Written-up versions of Hoffmann's videos, so check the original video when a detail matters.",
+    sourceNote: "The shakerato and tonic are from his own site. The rest are written-up versions of his videos, so check the original video when a detail matters.",
     sources: [
       { label: 'Ultimate V60 Technique (gist)', url: 'https://gist.github.com/fluency03/7fb305b8110dde5739d14697af97a99a' },
       { label: 'Ultimate V60, Hario USA', url: 'https://www.hario-usa.com/blogs/recipes-and-more-from-friends/james-hoffmann-uitimate-v60-technique' },
@@ -330,6 +532,8 @@ export const BARISTAS: Barista[] = [
       { label: 'French press recipe, Honest Coffee Guide', url: 'https://honestcoffeeguide.com/brew-recipes/james-hoffmann-french-press/' },
       { label: 'Moka pot routine, HuffPost UK', url: 'https://huffingtonpost.co.uk/entry/james-hoffmann-moka-pot-coffee-routine_uk_673b1cc9e4b0ebe12e36b57d' },
       { label: 'Immersion iced coffee, AeroPrecipe', url: 'https://aeroprecipe.com/recipes/james-hoffman-immersion-iced-coffee' },
+      { label: 'Caffè shakerato, jameshoffmann.co.uk', url: 'https://www.jameshoffmann.co.uk/weird-coffee-science/caffe-shakerato' },
+      { label: 'Espresso tonic recipes, jameshoffmann.co.uk', url: 'https://www.jameshoffmann.co.uk/weird-coffee-science/espresso-tonic-recipes' },
       { label: 'Immersion iced coffee, Sprudge', url: 'https://sprudge.com/summer-brew-methods-james-hoffmann-katie-carguilo-bust-out-the-slip-n-slide-3817.html' },
     ],
     recipes: HOFFMANN_RECIPES,
@@ -383,6 +587,70 @@ export const BARISTAS: Barista[] = [
       { label: 'V60 five-pour recipe video, Hario', url: 'https://www.youtube.com/watch?v=YIC-2nFQ7vM' },
     ],
     recipes: WINTON_RECIPES,
+  },
+  {
+    id: 'sasaki',
+    name: 'Shuichi Sasaki',
+    title: 'World AeroPress Champion 2014',
+    intro: [
+      {
+        lead: 'Low temperature, slow press.',
+        text: 'A Japanese barista with Paul Bassett, he won with 78°C water and a 75-second press, stopping before the bitter last part comes through.',
+      },
+    ],
+    sourceNote: 'His recipe as reported after the championship. Competition recipes are tuned to one coffee, so treat it as a starting point.',
+    sources: [
+      { label: '2014 World AeroPress Champion recipe, Daily Coffee News', url: 'https://dailycoffeenews.com/2014/06/13/how-to-brew-the-worlds-best-aeoropress-the-2014-world-champions-recipe' },
+    ],
+    recipes: SASAKI_RECIPES,
+  },
+  {
+    id: 'garay',
+    name: 'Carolina Ibarra Garay',
+    title: 'World AeroPress Champion 2018',
+    intro: [
+      {
+        lead: 'A strong concentrate, diluted to taste.',
+        text: 'The first American to win the World AeroPress Championship. She brews with a big dose and little water, then tops up with hot and room-temperature water.',
+      },
+    ],
+    sourceNote: 'Her recipe as reported after the championship, brewed with a Kenyan coffee every competitor had to use. Treat it as a starting point.',
+    sources: [
+      { label: 'Carolina Ibarra Garay winning recipe, Daily Coffee News', url: 'https://dailycoffeenews.com/2018/11/20/carolina-ibarra-garays-winning-recipe-from-the-world-aeropress-championship' },
+    ],
+    recipes: GARAY_RECIPES,
+  },
+  {
+    id: 'little',
+    name: 'Jibbi Little',
+    title: 'World AeroPress Champion 2022',
+    intro: [
+      {
+        lead: 'Brewed straight onto cold water.',
+        text: 'The Australian champion presses a short concentrate into a little cold water to lock in the flavour, then tops it up with hot water.',
+      },
+    ],
+    sourceNote: 'Her recipe as published by AeroPress.',
+    sources: [
+      { label: 'WAC 2022 champion Jibbi Little, AeroPress', url: 'https://aeropress.com/blogs/aeropress-recipes/wac-2022-champion-jibbi-little' },
+    ],
+    recipes: LITTLE_RECIPES,
+  },
+  {
+    id: 'wipvasutti',
+    name: 'Tay Wipvasutti',
+    title: 'World AeroPress Champion 2023',
+    intro: [
+      {
+        lead: 'Coffee added in two stages.',
+        text: 'Representing Thailand, he adds a small second dose of coffee partway through the brew to set the strength, then tops up with cool and hot water.',
+      },
+    ],
+    sourceNote: 'His winning method as written up after the championship.',
+    sources: [
+      { label: '2023 World AeroPress Champion Tay Wipvasutti, The Magic Roast', url: 'https://themagicroast.substack.com/p/introducing-2023-world-aeropress' },
+    ],
+    recipes: WIPVASUTTI_RECIPES,
   },
 ];
 

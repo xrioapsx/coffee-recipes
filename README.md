@@ -1,9 +1,12 @@
-# Coffee Honey Scaler
+# Kohi Kōbō
+
+*Kōhī kōbō* (コーヒー工房) is Japanese for "coffee workshop".
 
 Keep your own drinks, each with its own ingredients, and scale any of them up or
-down without changing how they taste. A second tab holds reference brew
-recipes from well-known baristas (James Hoffmann, Tetsu Kasuya, Scott Rao,
-Matt Winton), grouped by barista.
+down without changing how they taste. A second tab holds reference recipes
+from well-known baristas, grouped by barista: pour-over, AeroPress and
+espresso drinks from James Hoffmann, Tetsu Kasuya, Scott Rao, Matt Winton and
+four World AeroPress Champions.
 
 Calculator amounts are in **ml** (measured with a jigger); the barista recipes
 are in **grams**, as they give them. That mismatch is on purpose.
@@ -38,7 +41,8 @@ docs/HANDOFF.md          the full spec: data model, algorithm, test vectors, des
 ## Data
 
 Recipes are saved in this browser's `localStorage` under
-`coffee-honey-scaler-v2`. Data saved by the original app at the same address
+`coffee-honey-scaler-v2` (the key keeps the app's original name so existing
+data still loads). Data saved by the original app at the same address
 loads as-is. A different browser or domain starts empty.
 
 ## Deploy

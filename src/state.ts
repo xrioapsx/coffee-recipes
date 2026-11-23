@@ -5,6 +5,7 @@
 import type { Ingredient, Recipe } from './compute';
 import { num, uid } from './util';
 
+// Keys keep the app's original name on purpose: renaming them would orphan saved recipes.
 export const KEY = 'coffee-honey-scaler-v2';
 export const OLD_KEY = 'coffee-honey-scaler-v1';
 

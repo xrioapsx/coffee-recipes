@@ -32,9 +32,9 @@ describe('barista data', () => {
     },
   );
 
-  it('Hoffmann keeps his five recipes under their original ids', () => {
+  it('Hoffmann keeps his original five recipes, ids unchanged, first', () => {
     expect(BARISTAS[0].id).toBe('hoffmann');
-    expect(BARISTAS[0].recipes.map((r) => r.id)).toEqual(['v60', 'aero', 'press', 'moka', 'iced']);
+    expect(BARISTAS[0].recipes.map((r) => r.id).slice(0, 5)).toEqual(['v60', 'aero', 'press', 'moka', 'iced']);
   });
 
   it('an old saved selection resolves to Hoffmann; unknown ids fall back to the first barista', () => {
@@ -73,5 +73,30 @@ describe('barista recipe amounts', () => {
     expect(b.rows[1][1]).toBe('60 g');
     const upTo = b.steps.slice(1, 5).map((s) => grams(s[1]).at(-1));
     expect(upTo).toEqual([120, 180, 240, 300]);
+  });
+
+  it('Hoffmann shakerato at 40 g: 10 g syrup, 2 drops saline', () => {
+    const b = find('shakerato').build(40);
+    expect(b.rows.slice(0, 3).map((r) => r[1])).toEqual(['40 g', '10 g', '2 drops']);
+  });
+
+  it('Hoffmann espresso tonic at 120 g tonic: 35–40 g espresso', () => {
+    expect(find('tonic').build(120).rows[1][1]).toBe('35–40 g');
+  });
+
+  it('Sasaki 2014 at 250 g: 16.5 g coffee, 40 g bloom, 210 g, leave 45 g', () => {
+    expect(find('sasaki-2014').build(250).rows.map((r) => r[1])).toEqual(['16.5 g', '40 g', '210 g', 'about 45 g']);
+  });
+
+  it('Garay 2018 at 200 g: 34.9 g coffee, 100 g brew, 60 g hot, 40 g room temperature', () => {
+    expect(find('garay-2018').build(200).rows.map((r) => r[1])).toEqual(['34.9 g', '100 g', '60 g', '40 g']);
+  });
+
+  it('Little 2022 at 150 g: 18 g coffee, 20 g cold water, 94 g brew', () => {
+    expect(find('little-2022').build(150).rows.map((r) => r[1])).toEqual(['18 g', '20 g', '94 g', '150 g']);
+  });
+
+  it('Wipvasutti 2023 at 155 g: 16 g + 2 g coffee, 100 g brew, to 115 then 155', () => {
+    expect(find('wipvasutti-2023').build(155).rows.map((r) => r[1])).toEqual(['16 g', '2 g', '100 g', '115 g', '155 g']);
   });
 });
