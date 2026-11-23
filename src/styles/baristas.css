@@ -31,3 +31,8 @@ table.ing2 tr:last-child td { border-bottom: 0; }
 .barista .bt { font-size: 12.5px; color: var(--muted); }
 .barista[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
 .barista[aria-pressed="true"] .bt { color: inherit; opacity: 0.75; }
+
+/* make-ahead syrups and sauces under a recipe */
+.makeahead { background: var(--sunk); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.makeahead h3 { font-size: 16px; font-weight: 600; }
+.makeahead table.ing2 td:last-child { font-size: 16px; }

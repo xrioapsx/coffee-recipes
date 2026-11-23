@@ -17,6 +17,8 @@ export interface BrewBuild {
   /** Timed steps: [time or label, text]. Amounts inside the text rescale too. */
   steps: Array<[string, string]>;
   note?: string;
+  /** Make-ahead batches (syrups, sauces). Fixed amounts: they do not scale with the input. */
+  sub?: Array<{ title: string; rows: Array<[string, string]>; steps: string[] }>;
 }
 
 export interface BrewRecipe {
@@ -512,6 +514,257 @@ const WIPVASUTTI_RECIPES: BrewRecipe[] = [
   },
 ];
 
+/** Whole millilitres, for milk drinks measured by volume. */
+const ml = (n: number) => Math.round(n) + ' ml';
+const ESPRESSO_FACT: [string, string] = ['Espresso', 'Her recipes treat a double as about 40 ml'];
+
+const ECKROTH_RECIPES: BrewRecipe[] = [
+  {
+    id: 'eckroth-pantry',
+    name: 'Pantry Latte',
+    tag: 'spiced honey latte, hot',
+    input: { label: 'Milk (ml)', def: 240, min: 120, max: 480, step: 10 },
+    build: (m) => ({
+      facts: [
+        ESPRESSO_FACT,
+        ['Milk', 'Steamed. Her recipe says 8 oz, about 240 ml.'],
+        ['Why it works', 'Nothing to make ahead, only what is in the cupboard'],
+      ],
+      rows: [
+        ['Honey', ml(m / 16)],
+        ['Espresso', ml(m / 6)],
+        ['Ground cinnamon', 'a pinch'],
+        ['Ground nutmeg', 'a pinch'],
+        ['Milk', ml(m)],
+        ['Orange peel', 'for garnish'],
+      ],
+      steps: [
+        ['Honey', 'Put ' + ml(m / 16) + ' of honey in the glass first.'],
+        ['Espresso', 'Pull ' + ml(m / 6) + ' of espresso straight onto it.'],
+        ['Spices', 'Sprinkle the cinnamon and nutmeg on top, then stir. Adding them last stops them clumping.'],
+        ['Milk', 'Steam ' + ml(m) + ' of milk and pour it in as for a latte.'],
+        ['Finish', 'Squeeze an orange peel over the top so its oil lands on the drink.'],
+      ],
+    }),
+  },
+  {
+    id: 'eckroth-beekeeper',
+    name: 'The Beekeeper',
+    tag: 'infused honey latte',
+    input: { label: 'Milk (ml)', def: 180, min: 90, max: 360, step: 10 },
+    build: (m) => ({
+      facts: [
+        ['Espresso', 'Her recipe says 2 oz, about 60 ml'],
+        ['Milk', 'Steamed, any kind. Her recipe says 6 oz, about 180 ml.'],
+        ['Syrup', 'Honey infused with juniper, vanilla and lemon. Make it ahead.'],
+      ],
+      rows: [
+        ['Infused honey syrup', ml(m / 8)],
+        ['Espresso', ml(m / 3)],
+        ['Milk', ml(m)],
+        ['Bee pollen and an edible flower', 'for garnish'],
+      ],
+      steps: [
+        ['Base', 'Stir ' + ml(m / 8) + ' of the honey syrup into ' + ml(m / 3) + ' of fresh espresso.'],
+        ['Milk', 'Steam ' + ml(m) + ' of milk and pour it in.'],
+        ['Finish', 'Dust one side with bee pollen and float an edible flower on top.'],
+      ],
+      sub: [
+        {
+          title: 'Infused honey syrup',
+          rows: [
+            ['Honey', '200 g'],
+            ['Water', '100 g'],
+            ['Dried juniper berries', '15 g'],
+            ['Vanilla pods', '2'],
+            ['Lemon peel', 'from 1 lemon'],
+          ],
+          steps: [
+            'Lightly crush the juniper berries with the back of a spoon.',
+            'Split the vanilla pods and scrape out the seeds. Keep the pods too.',
+            'Put everything in a saucepan and simmer on medium heat for 5 minutes.',
+            'Let it cool completely, then strain out the solids.',
+            'Bottle it with the spent vanilla pods, which keep infusing. Keeps 2 weeks in the fridge.',
+          ],
+        },
+      ],
+    }),
+  },
+  {
+    id: 'eckroth-maple',
+    name: 'Salted Maple Latte',
+    tag: 'hot or iced',
+    input: { label: 'Milk (ml)', def: 250, min: 120, max: 500, step: 10 },
+    build: (m) => ({
+      facts: [
+        ESPRESSO_FACT,
+        ['Milk', 'Oat or whole, she suggests'],
+        ['Garnish', 'A sprig of rosemary, lit until it smokes'],
+      ],
+      rows: [
+        ['Espresso', ml((m * 40) / 250)],
+        ['Dark maple syrup', ml((m * 20) / 250)],
+        ['Sea salt', 'a heavy pinch'],
+        ['Milk', ml(m)],
+      ],
+      steps: [
+        ['Base', 'Stir ' + ml((m * 40) / 250) + ' of fresh espresso with ' + ml((m * 20) / 250) + ' of maple syrup and the salt.'],
+        ['Hot', 'Steam ' + ml(m) + ' of milk and pour it in as for a latte.'],
+        ['Iced', 'Or mix ' + ml(m) + ' of cold milk into the base and pour it over ice.'],
+        ['Finish', 'Light a rosemary sprig until it smokes and rest it on top. A pinch of cinnamon is optional.'],
+      ],
+    }),
+  },
+  {
+    id: 'eckroth-strawberry',
+    name: 'Strawberry Vanilla Latte',
+    tag: 'fresh strawberry syrup, hot or iced',
+    input: { label: 'Milk (ml)', def: 200, min: 100, max: 400, step: 10 },
+    build: (m) => ({
+      facts: [
+        ['Espresso', '40 ml'],
+        ['Milk', 'Whole or coconut, she suggests'],
+        ['Syrup', 'Fresh strawberries macerated in sugar. Make it 5 to 12 hours ahead.'],
+      ],
+      rows: [
+        ['Strawberry syrup', ml((m * 25) / 200)],
+        ['Espresso', ml((m * 40) / 200)],
+        ['Milk', ml(m)],
+        ['Fresh basil', 'for garnish'],
+      ],
+      steps: [
+        ['Base', 'Stir ' + ml((m * 25) / 200) + ' of strawberry syrup well into ' + ml((m * 40) / 200) + ' of espresso.'],
+        ['Milk', 'Top with ' + ml(m) + ' of steamed milk, or cold milk and then ice.'],
+        ['Finish', 'Add a sprig of basil for its smell with every sip.'],
+      ],
+      sub: [
+        {
+          title: 'Strawberry syrup',
+          rows: [
+            ['Fresh strawberries', '400 g'],
+            ['Cane sugar', '200 g'],
+            ['Vanilla paste', '5 g'],
+          ],
+          steps: [
+            'Slice the strawberries and toss them in the sugar until coated.',
+            'Leave in the fridge for 5 to 12 hours, until the sugar has dissolved.',
+            'Strain off the fruit (it is good to eat) and whisk in the vanilla paste.',
+            'Store in a sealed bottle in the fridge. Any amount works at 2 parts berries to 1 part sugar by weight.',
+          ],
+        },
+      ],
+    }),
+  },
+  {
+    id: 'eckroth-chai',
+    name: 'Dirty Chai',
+    tag: 'chai and espresso, steamed together',
+    input: { label: 'Milk (ml)', def: 100, min: 50, max: 250, step: 10 },
+    build: (m) => ({
+      facts: [
+        ['Espresso', '40 ml, a double'],
+        ['Chai', 'A shop-bought chai concentrate'],
+        ['Equipment', 'Espresso machine with a steam wand'],
+      ],
+      rows: [
+        ['Chai concentrate', ml(m)],
+        ['Milk', ml(m)],
+        ['Espresso', ml((m * 40) / 100)],
+        ['Orgeat or vanilla syrup (optional)', ml((m * 20) / 100)],
+        ['Nutmeg', 'freshly grated, to finish'],
+      ],
+      steps: [
+        ['Pitcher', 'Put the chai, milk, fresh espresso and the syrup if using into the steaming pitcher.'],
+        ['Steam', 'Steam it all together, then purge and wipe the wand well.'],
+        ['Serve', 'Pour into a mug and grate nutmeg on top.'],
+      ],
+    }),
+  },
+  {
+    id: 'eckroth-psl',
+    name: 'Pumpkin Spice Latte',
+    tag: 'homemade pumpkin syrup',
+    input: { label: 'Milk (ml)', def: 200, min: 100, max: 400, step: 10 },
+    build: (m) => ({
+      facts: [
+        ['Espresso', '40 ml'],
+        ['Milk', 'Any kind, steamed'],
+        ['Syrup', 'Brown sugar, pumpkin and baking spices. Leave the pumpkin out for a plain spiced syrup.'],
+      ],
+      rows: [
+        ['Pumpkin spice syrup', ml((m * 25) / 200)],
+        ['Espresso', ml((m * 40) / 200)],
+        ['Milk', ml(m)],
+      ],
+      steps: [
+        ['Base', 'Stir ' + ml((m * 25) / 200) + ' of syrup into ' + ml((m * 40) / 200) + ' of espresso.'],
+        ['Milk', 'Steam ' + ml(m) + ' of milk and pour it in.'],
+        ['Finish', 'Top with whipped cream, ground cinnamon or both.'],
+      ],
+      sub: [
+        {
+          title: 'Pumpkin spice syrup',
+          rows: [
+            ['Dark brown sugar', '200 g'],
+            ['Water', '100 ml'],
+            ['Pumpkin purée', '60 g'],
+            ['Cardamom, cinnamon, ginger, allspice (ground)', '2 g each'],
+            ['Cloves, black pepper (ground)', '1 g each'],
+          ],
+          steps: [
+            'Stir the sugar, water and pumpkin together in a pan over medium heat, then add the spices.',
+            'Keep it just below a simmer for 5 to 7 minutes.',
+            'Strain through cheesecloth to catch the spice and pumpkin bits.',
+            'Let it cool completely before bottling.',
+          ],
+        },
+      ],
+    }),
+  },
+  {
+    id: 'eckroth-gochugaru',
+    name: 'Gochugaru Mocha',
+    tag: 'chocolate with smoky Korean chilli',
+    input: { label: 'Milk (ml)', def: 250, min: 120, max: 500, step: 10 },
+    build: (m) => ({
+      facts: [
+        ESPRESSO_FACT,
+        ['Milk', 'Any kind, steamed'],
+        ['Sauce', 'Cocoa and sugar with gochugaru, a mild smoky chilli. Make it ahead.'],
+      ],
+      rows: [
+        ['Gochugaru chocolate sauce', ml((m * 25) / 250)],
+        ['Espresso', ml((m * 40) / 250)],
+        ['Milk', ml(m)],
+        ['Cocoa powder', 'for garnish'],
+      ],
+      steps: [
+        ['Base', 'Stir ' + ml((m * 25) / 250) + ' of chocolate sauce into ' + ml((m * 40) / 250) + ' of fresh espresso.'],
+        ['Milk', 'Steam ' + ml(m) + ' of milk and pour it in as for a latte.'],
+        ['Finish', 'Dust with cocoa powder.'],
+      ],
+      sub: [
+        {
+          title: 'Gochugaru chocolate sauce',
+          rows: [
+            ['Sugar', '120 g'],
+            ['Cocoa powder', '50 g'],
+            ['Gochugaru, finely ground', '7 g'],
+            ['Water', '150 ml'],
+            ['Vanilla extract', '4 ml'],
+          ],
+          steps: [
+            'Combine the sugar, cocoa, gochugaru and water in a small pan over medium-low heat, whisking out any lumps.',
+            'Once it turns syrupy, keep stirring for 3 to 4 minutes, then take it off the heat.',
+            'Stir in the vanilla and let it cool before storing in the fridge.',
+            'If it thickens in the fridge, stand the container in hot water for a few minutes.',
+          ],
+        },
+      ],
+    }),
+  },
+];
+
 export const BARISTAS: Barista[] = [
   {
     id: 'hoffmann',
@@ -537,6 +790,30 @@ export const BARISTAS: Barista[] = [
       { label: 'Immersion iced coffee, Sprudge', url: 'https://sprudge.com/summer-brew-methods-james-hoffmann-katie-carguilo-bust-out-the-slip-n-slide-3817.html' },
     ],
     recipes: HOFFMANN_RECIPES,
+  },
+  {
+    id: 'eckroth',
+    name: 'Morgan Eckroth',
+    title: 'US Barista Champion 2022',
+    intro: [
+      {
+        lead: 'Espresso with milk and syrups.',
+        text: 'Her Pantry Latte is a honey latte made from what is already in the cupboard, the nearest thing here to your coffee honey. Syrups that need making ahead have their own recipe below each drink.',
+      },
+      { text: 'Change the milk and the rest of the drink scales with it. The syrup batches stay as written.' },
+    ],
+    sourceNote: 'Her own recipes from her website. Where she gives ounces, the amounts here are converted to millilitres.',
+    sources: [
+      { label: 'The Pantry Latte', url: 'https://morgandrinkscoffee.com/blogs/recipes-1/the-pantry-latte' },
+      { label: 'The Beekeeper', url: 'https://morgandrinkscoffee.com/blogs/recipes/the-beekeeper' },
+      { label: 'Salted Maple Latte With Rosemary Smoke', url: 'https://morgandrinkscoffee.com/blogs/recipes-1/salted-maple-rosemary-latte' },
+      { label: 'Strawberry Vanilla Latte', url: 'https://morgandrinkscoffee.com/blogs/recipes-1/how-to-make-a-strawberry-vanilla-latte' },
+      { label: 'Dirty Chai', url: 'https://morgandrinkscoffee.com/blogs/recipes-1/how-to-make-a-dirty-chai' },
+      { label: 'Pumpkin Spice Latte', url: 'https://morgandrinkscoffee.com/blogs/recipes-1/how-to-make-a-pumpkin-spice-latte' },
+      { label: 'Gochugaru Mocha', url: 'https://morgandrinkscoffee.com/blogs/recipes-1/how-to-make-a-gochugaru-mocha' },
+      { label: 'All her recipes: The Menu', url: 'https://morgandrinkscoffee.com/blogs/recipes-1' },
+    ],
+    recipes: ECKROTH_RECIPES,
   },
   {
     id: 'kasuya',

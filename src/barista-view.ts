@@ -66,9 +66,17 @@ export function createBaristaView(S: AppState, save: () => void) {
       '<div class="facts">' +
       r.facts.map((f) => '<div class="fact"><div class="k">' + f[0] + '</div><div class="v">' + f[1] + '</div></div>').join('') +
       '</div>' +
-      '<table class="ing2"><tbody>' + rowsHtml(r) + '</tbody></table>' +
-      '<ol class="tl">' + stepsHtml(r) + '</ol>' +
-      (r.note ? '<p class="hint">' + r.note + '</p>' : '');
+      '<table class="ing2"><tbody id="r-rows">' + rowsHtml(r) + '</tbody></table>' +
+      '<ol class="tl" id="r-steps">' + stepsHtml(r) + '</ol>' +
+      (r.note ? '<p class="hint">' + r.note + '</p>' : '') +
+      (r.sub || [])
+        .map(
+          (s) =>
+            '<div class="makeahead"><h3>Make ahead: ' + esc(s.title) + '</h3>' +
+            '<table class="ing2"><tbody>' + s.rows.map((x) => '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>').join('') + '</tbody></table>' +
+            '<ol class="steps">' + s.steps.map((t) => '<li>' + t + '</li>').join('') + '</ol></div>',
+        )
+        .join('');
     $('rin').addEventListener('input', (e) => {
       const v = num((e.target as HTMLInputElement).value, NaN);
       if (isFinite(v) && v > 0) {
@@ -76,8 +84,8 @@ export function createBaristaView(S: AppState, save: () => void) {
         save();
         const rr = c.build(v);
         // Only the amounts table and steps change; the input itself is left alone.
-        $('recipe').querySelector('table.ing2 tbody')!.innerHTML = rowsHtml(rr);
-        $('recipe').querySelector('ol.tl')!.innerHTML = stepsHtml(rr);
+        $('r-rows').innerHTML = rowsHtml(rr);
+        $('r-steps').innerHTML = stepsHtml(rr);
       }
     });
 

@@ -99,4 +99,33 @@ describe('barista recipe amounts', () => {
   it('Wipvasutti 2023 at 155 g: 16 g + 2 g coffee, 100 g brew, to 115 then 155', () => {
     expect(find('wipvasutti-2023').build(155).rows.map((r) => r[1])).toEqual(['16 g', '2 g', '100 g', '115 g', '155 g']);
   });
+
+  it('Eckroth Pantry Latte at 240 ml milk: 15 ml honey, 40 ml espresso', () => {
+    expect(find('eckroth-pantry').build(240).rows.slice(0, 2).map((r) => r[1])).toEqual(['15 ml', '40 ml']);
+  });
+
+  it('Eckroth Beekeeper at 180 ml milk: ¾ oz syrup (23 ml), 2 oz espresso (60 ml)', () => {
+    expect(find('eckroth-beekeeper').build(180).rows.slice(0, 3).map((r) => r[1])).toEqual(['23 ml', '60 ml', '180 ml']);
+  });
+
+  it('Eckroth Salted Maple at 250 ml milk: 40 ml espresso, 20 ml maple', () => {
+    expect(find('eckroth-maple').build(250).rows.slice(0, 2).map((r) => r[1])).toEqual(['40 ml', '20 ml']);
+  });
+
+  it('Eckroth syrup lattes at 200 ml milk: 25 ml syrup, 40 ml espresso', () => {
+    for (const id of ['eckroth-strawberry', 'eckroth-psl']) {
+      expect(find(id).build(200).rows.slice(0, 3).map((r) => r[1])).toEqual(['25 ml', '40 ml', '200 ml']);
+    }
+  });
+
+  it('Eckroth Dirty Chai at 100 ml milk: 100 chai, 100 milk, 40 espresso, 20 syrup', () => {
+    expect(find('eckroth-chai').build(100).rows.slice(0, 4).map((r) => r[1])).toEqual(['100 ml', '100 ml', '40 ml', '20 ml']);
+  });
+
+  it('make-ahead batches stay fixed while the drink scales', () => {
+    const a = find('eckroth-gochugaru').build(250).sub;
+    const b = find('eckroth-gochugaru').build(500).sub;
+    expect(a).toEqual(b);
+    expect(a![0].rows[0]).toEqual(['Sugar', '120 g']);
+  });
 });

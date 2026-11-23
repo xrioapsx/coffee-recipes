@@ -5,8 +5,8 @@
 Keep your own drinks, each with its own ingredients, and scale any of them up or
 down without changing how they taste. A second tab holds reference recipes
 from well-known baristas, grouped by barista: pour-over, AeroPress and
-espresso drinks from James Hoffmann, Tetsu Kasuya, Scott Rao, Matt Winton and
-four World AeroPress Champions.
+espresso drinks (with milk and syrups too) from James Hoffmann, Morgan Eckroth,
+Tetsu Kasuya, Scott Rao, Matt Winton and four World AeroPress Champions.
 
 Calculator amounts are in **ml** (measured with a jigger); the barista recipes
 are in **grams**, as they give them. That mismatch is on purpose.
