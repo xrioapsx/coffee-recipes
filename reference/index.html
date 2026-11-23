@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coffee Honey Scaler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Mono:wght@400;500&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a kitchen-scale readout. Big mono numerals, a glass that fills as volume grows, honey amber as the single accent. */
+:root {
+  --bg: #eef0ec;
+  --surface: #fbfcfa;
+  --sunk: #e6e9e3;
+  --ink: #1b2427;
+  --muted: #5b676b;
+  --line: #d5dad4;
+  --accent: #e0a01b;
+  --accent-ink: #1b2427;
+  --accent-text: #8a5a00;
+  --danger: #a33a22;
+  --warn-bg: #fff3d6;
+  --warn-ink: #5c3d00;
+  --c1: #e0a01b;
+  --c2: #5a3828;
+  --c3: #8fd0e0;
+  --c4: #e8dcc2;
+  --c5: #7f9b6a;
+  --c6: #9c7490;
+  --water: #8ea2b8;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1517; --surface: #182022; --sunk: #121a1c; --ink: #e8eeee; --muted: #9aa8ab;
+    --line: #2a3639; --accent: #f0b429; --accent-ink: #14110a; --accent-text: #f0b429;
+    --danger: #e08a6c; --warn-bg: #3a2c0c; --warn-ink: #f3d9a0;
+    --c1: #f0b429; --c2: #a8745a; --c3: #6fb8cc; --c4: #cbbf9f; --c5: #86a874; --c6: #b089a4;
+    --water: #7f95ad;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1517; --surface: #182022; --sunk: #121a1c; --ink: #e8eeee; --muted: #9aa8ab;
+  --line: #2a3639; --accent: #f0b429; --accent-ink: #14110a; --accent-text: #f0b429;
+  --danger: #e08a6c; --warn-bg: #3a2c0c; --warn-ink: #f3d9a0;
+  --c1: #f0b429; --c2: #a8745a; --c3: #6fb8cc; --c4: #cbbf9f; --c5: #86a874; --c6: #b089a4;
+  --water: #7f95ad;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; margin: 0; text-wrap: balance; }
+button, input, select { font: inherit; color: inherit; }
+a { color: var(--accent-text); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.wrap { max-width: 1060px; margin: 0 auto; padding: 24px 16px 56px; }
+.top { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.mark { width: 14px; height: 38px; border-radius: 3px 3px 9px 9px; background: linear-gradient(to top, var(--c1) 0 40%, var(--c2) 40% 80%, var(--c3) 80%); flex: none; }
+h1 { font-size: clamp(26px, 5vw, 38px); font-weight: 800; letter-spacing: -0.02em; }
+.sub { margin: 0; color: var(--muted); max-width: 62ch; }
+.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); }
+.tabs a { text-decoration: none; color: var(--muted); padding: 10px 14px; font-weight: 600; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+.panel h2 { font-size: 19px; font-weight: 600; }
+.group { display: flex; flex-direction: column; gap: 10px; }
+.group + .group { border-top: 1px solid var(--line); padding-top: 16px; }
+.head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.hint { margin: 0; font-size: 13px; color: var(--muted); }
+
+.num { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-family: var(--font-mono); font-size: 15px; text-align: right; font-variant-numeric: tabular-nums; }
+.txt { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-weight: 600; }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.check input { width: 16px; height: 16px; accent-color: var(--accent); }
+.btn { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 8px 14px; cursor: pointer; font-weight: 600; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.small { padding: 5px 10px; font-size: 13px; }
+.btn.danger { color: var(--danger); }
+.btnrow { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* recipe switcher */
+.rtabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.rtab { border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 7px 14px; cursor: pointer; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rtab[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.rtab.add { border-style: dashed; font-weight: 600; }
+
+/* ingredient editor */
+.ings { display: flex; flex-direction: column; gap: 8px; }
+.ing { background: var(--sunk); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.ing .r1 { display: grid; grid-template-columns: 14px minmax(0, 1fr) 92px 32px; gap: 8px; align-items: center; }
+.ing .r2 { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; padding-left: 22px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+.sw.hatch { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.65) 0 3px, transparent 3px 6px); }
+.x { border: 0; background: transparent; cursor: pointer; color: var(--muted); font-size: 20px; line-height: 1; padding: 4px; border-radius: 6px; }
+.x:hover { color: var(--danger); }
+.maxbox { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.maxbox input[type="number"] { width: 74px; padding: 4px 8px; font-size: 13px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 7px 14px; cursor: pointer; font-weight: 600; font-family: var(--font-mono); font-size: 14px; }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.range { width: 100%; accent-color: var(--accent); }
+.row2 { display: grid; grid-template-columns: 1fr 104px; gap: 10px; align-items: center; }
+
+/* output */
+.readout { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; }
+.readout .big { font-family: var(--font-mono); font-weight: 500; font-size: clamp(46px, 9vw, 66px); line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+.readout .unit { font-family: var(--font-mono); font-size: 22px; color: var(--muted); }
+.delta { font-family: var(--font-mono); font-size: 15px; font-weight: 500; background: var(--accent); color: var(--accent-ink); padding: 3px 10px; border-radius: 999px; }
+.delta.zero { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+.viz { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; align-items: end; }
+@media (max-width: 430px) { .viz { grid-template-columns: minmax(0, 1fr); justify-items: center; } }
+.glass-wrap { position: relative; width: 150px; height: 280px; }
+.glass { position: absolute; left: 11px; top: 0; width: 128px; height: 100%; border: 2px solid var(--ink); border-top-color: var(--line); border-radius: 4px 4px 30px 30px; overflow: hidden; display: flex; flex-direction: column-reverse; background: var(--bg); }
+.layer { width: 100%; transition: height 0.25s ease; flex: none; }
+.layer.hatch { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 0 8px, transparent 8px 16px); }
+.marker { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--ink); transition: bottom 0.25s ease; pointer-events: none; }
+.marker span { position: absolute; right: 0; top: -20px; font-family: var(--font-mono); font-size: 11px; background: var(--surface); padding: 0 3px; }
+@media (prefers-reduced-motion: reduce) { .layer, .marker { transition: none; } }
+.list { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 4px 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.item:last-child { border-bottom: 0; }
+.item .nm { display: flex; align-items: center; gap: 8px; font-weight: 600; min-width: 0; }
+.item .nm span.t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item .val { font-family: var(--font-mono); font-size: 25px; font-weight: 500; font-variant-numeric: tabular-nums; text-align: right; }
+.item .val small { font-size: 14px; color: var(--muted); }
+.item .was { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); padding-left: 20px; margin-top: -6px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 10px; }
+.stat { background: var(--sunk); border-radius: 10px; padding: 10px 12px; }
+.stat .k { font-size: 12.5px; color: var(--muted); }
+.stat .v { font-family: var(--font-mono); font-size: 18px; font-variant-numeric: tabular-nums; }
+.stat .n { font-size: 12.5px; color: var(--muted); }
+.shares { display: flex; flex-direction: column; gap: 6px; }
+.share { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; font-size: 13.5px; align-items: baseline; }
+.share .b { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--sunk); overflow: hidden; }
+.share .b i { display: block; height: 100%; }
+.share .pct { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.warns { display: flex; flex-direction: column; gap: 8px; }
+.warn { background: var(--warn-bg); color: var(--warn-ink); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+ol.steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+textarea.copybox { width: 100%; min-height: 120px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-family: var(--font-mono); font-size: 13px; color: var(--ink); }
+
+/* Hoffmann */
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 16px; cursor: pointer; font-weight: 600; }
+.pill[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.note { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 12px 14px; margin: 16px 0; }
+.note p { margin: 0; max-width: 72ch; }
+.note p + p { margin-top: 6px; }
+.rhead { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; align-items: baseline; }
+.rhead h2 { font-size: 26px; font-weight: 800; }
+.tag { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.fact { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+.fact .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.fact .v { font-weight: 600; }
+table.ing2 { width: 100%; border-collapse: collapse; }
+table.ing2 td { padding: 9px 0; border-bottom: 1px solid var(--line); }
+table.ing2 td:last-child { text-align: right; font-family: var(--font-mono); font-size: 20px; font-variant-numeric: tabular-nums; }
+table.ing2 tr:last-child td { border-bottom: 0; }
+.tl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.tl li { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.tl li:last-child { border-bottom: 0; }
+.tl .t { font-family: var(--font-mono); font-size: 13px; color: var(--accent-text); padding-top: 2px; }
+.sources { font-size: 13.5px; color: var(--muted); }
+.sources ul { margin: 6px 0 0; padding-left: 20px; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <h1>Coffee Honey Scaler</h1>
+    </div>
+    <p class="sub">Keep your own drinks here, each with its own ingredients, and scale any of them up or down without changing how they taste. The second tab holds James Hoffmann's reference brews.</p>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#calculator" id="tab-calc">My recipes</a>
+      <a href="#hoffmann" id="tab-hof">Hoffmann recipes</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="view-calc" aria-label="My recipes">
+      <div class="grid">
+        <div class="panel">
+          <div class="group">
+            <div class="head">
+              <h2>My recipes</h2>
+              <span class="hint" id="count"></span>
+            </div>
+            <div class="rtabs" id="rtabs" role="group" aria-label="Choose a recipe"></div>
+            <div class="row2" style="grid-template-columns:minmax(0,1fr) auto">
+              <input class="txt" id="rname" aria-label="Recipe name" placeholder="Name this drink">
+              <div class="btnrow">
+                <button class="btn small" type="button" id="dup">Duplicate</button>
+                <button class="btn small danger" type="button" id="del">Delete</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="group">
+            <div class="head">
+              <h2>Ingredients</h2>
+              <span class="hint">in ml</span>
+            </div>
+            <div class="ings" id="ings"></div>
+            <button class="btn small" type="button" id="addIng">Add ingredient</button>
+            <p class="hint">Keep fixed holds an amount steady while everything else scales. Melts marks ice, so it counts toward volume but only partly toward liquid. Max caps an ingredient, and anything over it becomes water.</p>
+          </div>
+
+          <div class="group">
+            <h2>How much more?</h2>
+            <div class="chips" role="group" aria-label="Quick extra volume">
+              <button class="chip" type="button" data-extra="0">Original</button>
+              <button class="chip" type="button" data-extra="30">+30</button>
+              <button class="chip" type="button" data-extra="40">+40</button>
+              <button class="chip" type="button" data-extra="50">+50</button>
+            </div>
+            <input class="range" id="extra-range" type="range" min="-100" max="300" step="5" aria-label="Extra volume, ml">
+            <div class="row2">
+              <label for="total-input">Total volume you want (ml)</label>
+              <input class="num" id="total-input" type="number" inputmode="decimal" min="0" step="5">
+            </div>
+          </div>
+
+          <div class="group">
+            <h2>Settings for this recipe</h2>
+            <div class="row2">
+              <label for="melt-input">Ice that melts while shaking (%)<br><span class="hint">An estimate. It only affects the liquid and share figures.</span></label>
+              <input class="num" id="melt-input" type="number" inputmode="decimal" min="0" max="80" step="5">
+            </div>
+            <label class="check" for="round5"><input type="checkbox" id="round5">Round amounts to 5 ml</label>
+          </div>
+        </div>
+
+        <div class="panel" aria-live="polite">
+          <div class="readout">
+            <span class="big" id="out-total">250</span><span class="unit">ml</span>
+            <span class="delta" id="out-delta">+40 ml</span>
+          </div>
+          <p class="hint" id="out-name"></p>
+
+          <div class="viz">
+            <div class="glass-wrap" role="img" aria-label="Glass showing the volume of each ingredient" id="glass-wrap">
+              <div class="glass" id="glass"></div>
+              <div class="marker" id="marker"><span id="marker-label">original</span></div>
+            </div>
+            <div class="list" id="list"></div>
+          </div>
+
+          <div class="warns" id="warns"></div>
+          <div class="stats" id="stats"></div>
+
+          <div class="group">
+            <h2>Balance</h2>
+            <div class="shares" id="shares"></div>
+            <p class="hint">Each ingredient as a share of the liquid in the glass, with the original in brackets. Matching numbers mean the taste holds.</p>
+          </div>
+
+          <div class="group">
+            <h2>Method</h2>
+            <ol class="steps">
+              <li>Stir any honey or syrup into the warm coffee until it dissolves. Cold honey sticks to the shaker.</li>
+              <li>Add the ice and shake until the shaker is frosty on the outside.</li>
+              <li>Strain into a glass, over fresh ice if you like.</li>
+            </ol>
+            <div class="btnrow">
+              <button class="btn primary" type="button" id="copy">Copy recipe</button>
+            </div>
+            <p class="hint" id="copy-status" role="status"></p>
+            <textarea class="copybox" id="copybox" readonly hidden aria-label="Recipe text"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-hof" aria-label="Hoffmann recipes" hidden>
+      <div class="note">
+        <p><strong>Closest to a shaken iced drink: the immersion iced coffee.</strong> Hoffmann brews strong coffee hot and presses it straight onto ice, so the melting ice does the diluting. A shaker works the same way, which is why the calculator counts ice melt.</p>
+        <p>Pick a recipe, then change the water to scale everything else in it.</p>
+      </div>
+      <div class="pills" id="pills" role="group" aria-label="Recipes"></div>
+      <div class="panel" id="recipe" style="margin-top:16px"></div>
+      <div class="sources" style="margin-top:18px">
+        <strong>Where these numbers come from.</strong> Written-up versions of Hoffmann's videos, so check the original video when a detail matters.
+        <ul>
+          <li><a href="https://gist.github.com/fluency03/7fb305b8110dde5739d14697af97a99a" target="_blank" rel="noopener">Ultimate V60 Technique (gist)</a> and <a href="https://www.hario-usa.com/blogs/recipes-and-more-from-friends/james-hoffmann-uitimate-v60-technique" target="_blank" rel="noopener">Hario USA</a></li>
+          <li><a href="https://gist.github.com/fluency03/a494eed7504c8f2b3a162a84f3941168" target="_blank" rel="noopener">Ultimate AeroPress Technique (gist)</a></li>
+          <li><a href="https://honestcoffeeguide.com/brew-recipes/james-hoffmann-french-press/" target="_blank" rel="noopener">French press recipe, Honest Coffee Guide</a></li>
+          <li><a href="https://huffingtonpost.co.uk/entry/james-hoffmann-moka-pot-coffee-routine_uk_673b1cc9e4b0ebe12e36b57d" target="_blank" rel="noopener">Moka pot routine, HuffPost UK</a></li>
+          <li><a href="https://aeroprecipe.com/recipes/james-hoffman-immersion-iced-coffee" target="_blank" rel="noopener">Immersion iced coffee, AeroPrecipe</a> and <a href="https://sprudge.com/summer-brew-methods-james-hoffmann-katie-carguilo-bust-out-the-slip-n-slide-3817.html" target="_blank" rel="noopener">Sprudge</a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+// <compute>
+function compute(recipe) {
+  var ings = recipe.ingredients || [];
+  var melt = Math.min(Math.max(recipe.melt || 0, 0), 100) / 100;
+  var step = recipe.round5 ? 5 : 1;
+  var warn = [];
+  var baseTotal = 0, L = 0, U = 0;
+  ings.forEach(function (g) {
+    var v = Math.max(0, g.ml || 0);
+    baseTotal += v;
+    if (g.lock) L += v; else U += v;
+  });
+  var target = Math.max(0, baseTotal + (recipe.extra || 0));
+  var out = ings.map(function (g) { return { id: g.id, name: g.name, ice: !!g.ice, base: Math.max(0, g.ml || 0), ml: Math.max(0, g.ml || 0) }; });
+
+  if (ings.length === 0) {
+    warn.push('This recipe has no ingredients yet. Add one to start.');
+  } else if (U <= 0) {
+    if (L > 0) warn.push('Every ingredient is fixed, so nothing can scale. Untick "keep fixed" on at least one.');
+  } else {
+    var factor = (target - L) / U;
+    if (factor < 0) {
+      warn.push('The total is smaller than the fixed ingredients alone. Raise the total, or untick one of them.');
+      factor = 0;
+    }
+    out.forEach(function (o, i) {
+      o.ml = ings[i].lock ? o.base : Math.round(o.base * factor / step) * step;
+    });
+    if (step === 1 && factor > 0) {
+      var sum = out.reduce(function (a, o) { return a + o.ml; }, 0);
+      var residual = Math.round(target - sum);
+      if (residual !== 0) {
+        var pick = -1;
+        out.forEach(function (o, i) { if (!ings[i].lock && (pick < 0 || o.base > out[pick].base)) pick = i; });
+        if (pick >= 0) out[pick].ml = Math.max(0, out[pick].ml + residual);
+      }
+    }
+  }
+
+  var water = 0;
+  out.forEach(function (o, i) {
+    var cap = Math.max(0, ings[i] && ings[i].max || 0);
+    if (cap > 0 && o.ml > cap) {
+      var over = o.ml - cap;
+      water += over;
+      o.ml = cap;
+      o.capped = over;
+      warn.push((o.name || 'An ingredient') + ' is capped at ' + cap + ' ml, so ' + over + ' ml becomes water. That part of the drink will taste milder.');
+    }
+  });
+
+  var total = out.reduce(function (a, o) { return a + o.ml; }, 0) + water;
+  var liquid = water, baseLiquid = 0, iceLeft = 0;
+  out.forEach(function (o) {
+    liquid += o.ice ? o.ml * melt : o.ml;
+    baseLiquid += o.ice ? o.base * melt : o.base;
+    if (o.ice) iceLeft += o.ml * (1 - melt);
+  });
+  out.forEach(function (o) {
+    o.share = liquid > 0 ? o.ml / liquid * 100 : 0;
+    o.baseShare = baseLiquid > 0 ? o.base / baseLiquid * 100 : 0;
+  });
+
+  return { ingredients: out, water: water, total: total, baseTotal: baseTotal, target: target,
+           warn: warn, liquid: liquid, baseLiquid: baseLiquid, iceLeft: iceLeft };
+}
+// </compute>
+
+(function () {
+  var KEY = 'coffee-honey-scaler-v2';
+  var OLD = 'coffee-honey-scaler-v1';
+  var COLORS = ['--c1', '--c2', '--c3', '--c4', '--c5', '--c6'];
+
+  function uid() { return Math.random().toString(36).slice(2, 9); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function $(id) { return document.getElementById(id); }
+  function num(v, f) { var n = parseFloat(v); return isFinite(n) ? n : f; }
+  function fmt(n) { var r = Math.round(n * 10) / 10; return Number.isInteger(r) ? String(r) : r.toFixed(1); }
+
+  function starter() {
+    return {
+      id: uid(), name: 'Coffee honey', extra: 40, melt: 25, round5: false,
+      ingredients: [
+        { id: uid(), name: 'Honey', ml: 40, lock: false, ice: false, max: 0 },
+        { id: uid(), name: 'Espresso (brikka)', ml: 70, lock: false, ice: false, max: 0 },
+        { id: uid(), name: 'Ice cubes', ml: 100, lock: false, ice: true, max: 0 }
+      ]
+    };
+  }
+
+  function migrate() {
+    try {
+      var raw = localStorage.getItem(OLD);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      var r = starter();
+      if (o.base) {
+        r.ingredients[0].ml = num(o.base.honey, 40);
+        r.ingredients[1].ml = num(o.base.espresso, 70);
+        r.ingredients[2].ml = num(o.base.ice, 100);
+      }
+      if (o.lock) {
+        r.ingredients[0].lock = !!o.lock.honey;
+        r.ingredients[1].lock = !!o.lock.espresso;
+        r.ingredients[2].lock = !!o.lock.ice;
+      }
+      if (typeof o.extra === 'number') r.extra = o.extra;
+      if (typeof o.melt === 'number') r.melt = o.melt;
+      if (typeof o.cap === 'number' && o.cap > 0) r.ingredients[1].max = o.cap;
+      r.round5 = !!o.round5;
+      return { recipes: [r], currentId: r.id, hof: o.recipe || 'v60', hofInputs: o.inputs || {} };
+    } catch (e) { return null; }
+  }
+
+  function load() {
+    var o = null;
+    try { var raw = localStorage.getItem(KEY); if (raw) o = JSON.parse(raw); } catch (e) { o = null; }
+    if (!o) o = migrate();
+    if (!o || !Array.isArray(o.recipes) || o.recipes.length === 0) {
+      var r = starter();
+      o = { recipes: [r], currentId: r.id, hof: 'v60', hofInputs: {} };
+    }
+    o.recipes = o.recipes.map(function (r) {
+      return {
+        id: r.id || uid(),
+        name: typeof r.name === 'string' ? r.name : 'Untitled drink',
+        extra: typeof r.extra === 'number' ? r.extra : 0,
+        melt: typeof r.melt === 'number' ? r.melt : 25,
+        round5: !!r.round5,
+        ingredients: (Array.isArray(r.ingredients) ? r.ingredients : []).map(function (g) {
+          return { id: g.id || uid(), name: typeof g.name === 'string' ? g.name : 'Ingredient',
+                   ml: Math.max(0, num(g.ml, 0)), lock: !!g.lock, ice: !!g.ice, max: Math.max(0, num(g.max, 0)) };
+        })
+      };
+    });
+    if (!o.recipes.some(function (r) { return r.id === o.currentId; })) o.currentId = o.recipes[0].id;
+    o.hof = o.hof || 'v60';
+    o.hofInputs = o.hofInputs || {};
+    return o;
+  }
+
+  var S = load();
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } }
+  function cur() { return S.recipes.filter(function (r) { return r.id === S.currentId; })[0] || S.recipes[0]; }
+  function colorOf(i) { return 'var(' + COLORS[i % COLORS.length] + ')'; }
+
+  /* ---------- rendering ---------- */
+
+  function renderTabs() {
+    $('rtabs').innerHTML = S.recipes.map(function (r) {
+      return '<button class="rtab" type="button" data-id="' + esc(r.id) + '" aria-pressed="' + (r.id === S.currentId) + '">' + esc(r.name || 'Untitled') + '</button>';
+    }).join('') + '<button class="rtab add" type="button" id="newRecipe">+ New recipe</button>';
+    $('rtabs').querySelectorAll('.rtab[data-id]').forEach(function (b) {
+      b.addEventListener('click', function () { S.currentId = b.dataset.id; save(); renderAll(); });
+    });
+    $('newRecipe').addEventListener('click', function () {
+      var r = { id: uid(), name: 'New drink', extra: 0, melt: 25, round5: false,
+                ingredients: [{ id: uid(), name: 'Coffee', ml: 100, lock: false, ice: false, max: 0 }] };
+      S.recipes.push(r); S.currentId = r.id; save(); renderAll();
+      $('rname').focus(); $('rname').select();
+    });
+    $('count').textContent = S.recipes.length + (S.recipes.length === 1 ? ' recipe' : ' recipes') + ', saved in this browser';
+    $('del').disabled = S.recipes.length <= 1;
+  }
+
+  function renderIngredients() {
+    var r = cur();
+    $('ings').innerHTML = r.ingredients.map(function (g, i) {
+      return '<div class="ing" data-id="' + esc(g.id) + '">' +
+        '<div class="r1">' +
+          '<span class="sw' + (g.ice ? ' hatch' : '') + '" style="background:' + colorOf(i) + '"></span>' +
+          '<input class="txt f-name" value="' + esc(g.name) + '" aria-label="Ingredient name">' +
+          '<input class="num f-ml" type="number" inputmode="decimal" min="0" step="1" value="' + g.ml + '" aria-label="Amount in ml for ' + esc(g.name) + '">' +
+          '<button class="x f-del" type="button" aria-label="Remove ' + esc(g.name) + '">&times;</button>' +
+        '</div>' +
+        '<div class="r2">' +
+          '<label class="check"><input type="checkbox" class="f-lock"' + (g.lock ? ' checked' : '') + '>Keep fixed</label>' +
+          '<label class="check"><input type="checkbox" class="f-ice"' + (g.ice ? ' checked' : '') + '>Melts (ice)</label>' +
+          '<span class="maxbox"><label>Max <input class="num f-max" type="number" inputmode="decimal" min="0" step="5" value="' + g.max + '"></label> ml, 0 = none</span>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    $('ings').querySelectorAll('.ing').forEach(function (row) {
+      var id = row.dataset.id;
+      function g() { return cur().ingredients.filter(function (x) { return x.id === id; })[0]; }
+      row.querySelector('.f-name').addEventListener('input', function (e) {
+        var it = g(); if (!it) return;
+        it.name = e.target.value; save(); renderOut();
+      });
+      row.querySelector('.f-ml').addEventListener('input', function (e) {
+        var it = g(); if (!it) return;
+        it.ml = Math.max(0, num(e.target.value, 0)); save(); renderOut(); syncTotals();
+      });
+      row.querySelector('.f-max').addEventListener('input', function (e) {
+        var it = g(); if (!it) return;
+        it.max = Math.max(0, num(e.target.value, 0)); save(); renderOut();
+      });
+      row.querySelector('.f-lock').addEventListener('change', function (e) {
+        var it = g(); if (!it) return;
+        it.lock = e.target.checked; save(); renderOut();
+      });
+      row.querySelector('.f-ice').addEventListener('change', function (e) {
+        var it = g(); if (!it) return;
+        it.ice = e.target.checked; save(); renderIngredients(); renderOut();
+      });
+      row.querySelector('.f-del').addEventListener('click', function () {
+        var r2 = cur();
+        r2.ingredients = r2.ingredients.filter(function (x) { return x.id !== id; });
+        save(); renderIngredients(); renderOut(); syncTotals();
+      });
+    });
+  }
+
+  function renderControls() {
+    var r = cur();
+    if (document.activeElement !== $('rname')) $('rname').value = r.name;
+    if (document.activeElement !== $('melt-input')) $('melt-input').value = r.melt;
+    $('round5').checked = r.round5;
+    $('extra-range').value = Math.min(Math.max(r.extra, -100), 300);
+    document.querySelectorAll('.chip').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(num(b.dataset.extra, NaN) === r.extra));
+    });
+    syncTotals();
+  }
+
+  function syncTotals() {
+    var r = cur();
+    var c = compute(r);
+    if (document.activeElement !== $('total-input')) $('total-input').value = c.baseTotal + r.extra;
+  }
+
+  function renderOut() {
+    var r = cur(), c = compute(r);
+    $('out-total').textContent = c.total;
+    var d = c.total - c.baseTotal;
+    var de = $('out-delta');
+    de.textContent = d === 0 ? 'same as original' : (d > 0 ? '+' : '') + d + ' ml';
+    de.className = 'delta' + (d === 0 ? ' zero' : '');
+    $('out-name').textContent = (r.name || 'Untitled') + ', originally ' + c.baseTotal + ' ml';
+
+    var scale = Math.max(200, Math.ceil(Math.max(c.total, c.baseTotal) * 1.08 / 10) * 10);
+    var layers = c.ingredients.map(function (o, i) {
+      return o.ml > 0 ? '<div class="layer' + (o.ice ? ' hatch' : '') + '" style="height:' + (o.ml / scale * 100) + '%;background:' + colorOf(i) + '"></div>' : '';
+    }).join('');
+    if (c.water > 0) layers += '<div class="layer" style="height:' + (c.water / scale * 100) + '%;background:var(--water)"></div>';
+    $('glass').innerHTML = layers;
+    $('marker').style.bottom = (c.baseTotal / scale * 100) + '%';
+    $('marker-label').textContent = 'original ' + c.baseTotal;
+
+    var rows = c.ingredients.map(function (o, i) {
+      var diff = o.ml - o.base;
+      var note = r.ingredients[i] && r.ingredients[i].lock
+        ? 'fixed at ' + o.base + ' ml'
+        : 'was ' + o.base + ' ml (' + (diff >= 0 ? '+' : '') + diff + ')';
+      if (o.capped) note += ', capped';
+      return '<div class="item"><span class="nm"><span class="sw' + (o.ice ? ' hatch' : '') + '" style="background:' + colorOf(i) + '"></span><span class="t">' + esc(o.name || 'Ingredient') + '</span></span>' +
+        '<span class="val">' + o.ml + ' <small>ml</small></span><span class="was">' + note + '</span></div>';
+    }).join('');
+    if (c.water > 0) {
+      rows += '<div class="item"><span class="nm"><span class="sw" style="background:var(--water)"></span><span class="t">Water</span></span>' +
+        '<span class="val">' + c.water + ' <small>ml</small></span><span class="was">tops up what was capped</span></div>';
+    }
+    $('list').innerHTML = rows || '<p class="hint">No ingredients yet.</p>';
+
+    $('warns').innerHTML = c.warn.map(function (w) { return '<div class="warn">' + esc(w) + '</div>'; }).join('');
+
+    var drift = 0;
+    c.ingredients.forEach(function (o) { drift = Math.max(drift, Math.abs(o.share - o.baseShare)); });
+    $('stats').innerHTML =
+      stat('In the glass after shaking', '≈ ' + Math.round(c.liquid) + ' ml liquid', c.iceLeft > 0 ? '+ about ' + Math.round(c.iceLeft) + ' ml ice left' : 'no ice in this recipe') +
+      stat('Balance vs original', drift < 0.5 ? 'unchanged' : 'off by ' + drift.toFixed(1) + ' pts', drift < 0.5 ? 'tastes the same' : 'from fixed amounts, caps or rounding') +
+      stat('Total volume', c.total + ' ml', 'original ' + c.baseTotal + ' ml');
+
+    $('shares').innerHTML = c.ingredients.map(function (o, i) {
+      return '<div class="share"><span>' + esc(o.name || 'Ingredient') + '</span>' +
+        '<span class="pct">' + o.share.toFixed(1) + '% <span style="color:var(--muted)">(' + o.baseShare.toFixed(1) + ')</span></span>' +
+        '<span class="b"><i style="width:' + Math.min(100, o.share) + '%;background:' + colorOf(i) + '"></i></span></div>';
+    }).join('');
+  }
+  function stat(k, v, n) { return '<div class="stat"><div class="k">' + k + '</div><div class="v">' + v + '</div><div class="n">' + n + '</div></div>'; }
+
+  function renderAll() { renderTabs(); renderIngredients(); renderControls(); renderOut(); }
+
+  function recipeText() {
+    var r = cur(), c = compute(r);
+    var lines = [(r.name || 'Untitled') + ' — ' + c.total + ' ml (' + (c.total - c.baseTotal >= 0 ? '+' : '') + (c.total - c.baseTotal) + ' ml vs original)'];
+    c.ingredients.forEach(function (o) { lines.push(o.name + ': ' + o.ml + ' ml'); });
+    if (c.water > 0) lines.push('Water: ' + c.water + ' ml');
+    lines.push('Shake with ice, then strain.');
+    return lines.join('\n');
+  }
+
+  function bind() {
+    $('rname').addEventListener('input', function (e) {
+      cur().name = e.target.value; save();
+      var tab = $('rtabs').querySelector('.rtab[data-id="' + cur().id + '"]');
+      if (tab) tab.textContent = e.target.value || 'Untitled';
+      renderOut();
+    });
+    $('dup').addEventListener('click', function () {
+      var r = cur();
+      var copy = JSON.parse(JSON.stringify(r));
+      copy.id = uid();
+      copy.name = r.name + ' copy';
+      copy.ingredients.forEach(function (g) { g.id = uid(); });
+      S.recipes.splice(S.recipes.indexOf(r) + 1, 0, copy);
+      S.currentId = copy.id; save(); renderAll();
+    });
+    $('del').addEventListener('click', function () {
+      if (S.recipes.length <= 1) return;
+      var r = cur(), i = S.recipes.indexOf(r);
+      S.recipes.splice(i, 1);
+      S.currentId = S.recipes[Math.max(0, i - 1)].id;
+      save(); renderAll();
+    });
+    $('addIng').addEventListener('click', function () {
+      cur().ingredients.push({ id: uid(), name: 'New ingredient', ml: 0, lock: false, ice: false, max: 0 });
+      save(); renderIngredients(); renderOut();
+      var rows = $('ings').querySelectorAll('.ing');
+      var last = rows[rows.length - 1];
+      if (last) { var f = last.querySelector('.f-name'); f.focus(); f.select(); }
+    });
+    document.querySelectorAll('.chip').forEach(function (b) {
+      b.addEventListener('click', function () { cur().extra = num(b.dataset.extra, 0); save(); renderControls(); renderOut(); });
+    });
+    $('extra-range').addEventListener('input', function (e) { cur().extra = num(e.target.value, 0); save(); renderControls(); renderOut(); });
+    $('total-input').addEventListener('input', function (e) {
+      var t = num(e.target.value, NaN);
+      if (isFinite(t)) {
+        var r = cur();
+        r.extra = Math.round(t - compute(r).baseTotal);
+        save(); renderControls(); renderOut();
+      }
+    });
+    $('melt-input').addEventListener('input', function (e) { cur().melt = Math.min(80, Math.max(0, num(e.target.value, 0))); save(); renderOut(); });
+    $('round5').addEventListener('change', function (e) { cur().round5 = e.target.checked; save(); renderOut(); });
+    $('copy').addEventListener('click', function () {
+      var text = recipeText(), status = $('copy-status'), box = $('copybox');
+      function fallback() {
+        box.hidden = false; box.value = text; box.focus(); box.select();
+        status.textContent = 'Copy was blocked here. The text is selected below, so press your copy shortcut.';
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () { box.hidden = true; status.textContent = 'Copied.'; }, fallback);
+      } catch (e) { fallback(); }
+    });
+  }
+
+  /* ---------- Hoffmann recipes ---------- */
+  var RECIPES = [
+    { id: 'v60', name: 'Ultimate V60', tag: '60 g/L, about 3:00 to 3:30',
+      input: { label: 'Water (g)', def: 500, min: 100, max: 1500, step: 10 },
+      build: function (w) { var c = w * 0.06, bloom = c * 2.5; return {
+        facts: [['Grind', 'Medium-fine'], ['Water temperature', 'Just off the boil. Hotter is better, especially for light roasts.'], ['Brewer', 'Hario V60 with paper filter']],
+        rows: [['Coffee', fmt(c) + ' g'], ['Bloom pour', fmt(bloom) + ' g'], ['Pour to at 0:45', fmt(w * 0.6) + ' g'], ['Final pour to at 1:15', fmt(w) + ' g']],
+        steps: [['Prep', 'Rinse the filter with hot water, add ' + fmt(c) + ' g of coffee and make a small well in the middle.'],
+          ['0:00', 'Pour ' + fmt(bloom) + ' g for the bloom (about 2.5 times the coffee, never more than 3). Swirl so the slurry is even.'],
+          ['0:45', 'Pour up to ' + fmt(w * 0.6) + ' g over about 30 seconds.'],
+          ['1:15', 'Pour up to ' + fmt(w) + ' g over about 30 seconds, a little slower and gentler than the first pour.'],
+          ['1:45', 'Stir once clockwise and once anticlockwise with a spoon to knock grounds off the walls.'],
+          ['Then', 'Let it drain a little, then give the V60 a gentle swirl to level the bed.'],
+          ['by 3:00', 'Aim for the drawdown to finish around 3:00. Some write-ups say 3:30.']] }; } },
+    { id: 'aero', name: 'Ultimate AeroPress', tag: '55 g/L, about 3 minutes',
+      input: { label: 'Water (g)', def: 200, min: 100, max: 300, step: 10 },
+      build: function (w) { var c = w * 0.055; return {
+        facts: [['Grind', 'Finer end of medium for light roast'], ['Water temperature', 'Freshly boiled. Down to about 90°C for very dark roasts.'], ['Position', 'Standard, not inverted. No rinsing or preheating.']],
+        rows: [['Coffee', fmt(c) + ' g'], ['Water', fmt(w) + ' g']],
+        steps: [['Prep', 'Put a filter in the cap without rinsing it. Lock the cap on and set the AeroPress on a mug or server.'],
+          ['Add', fmt(c) + ' g of coffee. Shake the brewer lightly to level the bed.'],
+          ['0:00', 'Pour all ' + fmt(w) + ' g of water, making sure every grain is wet. Start the timer and set the plunger about 1 cm into the top.'],
+          ['2:00', 'Hold the brewer and plunger and swirl gently.'],
+          ['2:30', 'Press slowly all the way down, taking about 30 seconds.'],
+          ['Darker roast', 'Use a little more coffee, grind coarser and lower the water temperature.']] }; } },
+    { id: 'press', name: 'Ultimate French press', tag: '60 g/L, about 10 minutes',
+      input: { label: 'Water (g)', def: 500, min: 200, max: 1000, step: 10 },
+      build: function (w) { var c = w * 0.06; return {
+        facts: [['Grind', 'Medium-coarse'], ['Water temperature', 'Just boiled, 100°C'], ['Note', 'Another write-up uses 1:15, so 30 g to 450 g. Both work.']],
+        rows: [['Coffee', fmt(c) + ' g'], ['Water', fmt(w) + ' g']],
+        steps: [['Prep', 'Put the French press on a scale, add ' + fmt(c) + ' g of ground coffee and tare.'],
+          ['0:00', 'Pour ' + fmt(w) + ' g of water over the grounds in about 10 seconds. Do not stir yet.'],
+          ['4:00', 'Stir the crust that formed on top.'],
+          ['Skim', 'Use two spoons to lift off the foam and floating grounds.'],
+          ['Wait', 'Leave it alone for 5 to 8 minutes while the grounds settle.'],
+          ['Serve', 'Rest the plunger on the surface without pressing it down, then pour gently so the silt stays behind.']] }; } },
+    { id: 'moka', name: 'Moka pot', tag: 'about 1:10 by weight',
+      input: { label: 'Water in the base (ml)', def: 150, min: 50, max: 600, step: 10 },
+      build: function (w) { var c = w / 10; return {
+        facts: [['Water', 'Boil first, then fill to the valve with water just off the boil'], ['Basket', 'Level to the top, loose, do not press down'], ['Optional', 'An AeroPress filter under the top section']],
+        rows: [['Water in base', fmt(w) + ' ml'], ['Coffee (about a tenth of the water)', fmt(c) + ' g']],
+        steps: [['Fill', 'Add ' + fmt(w) + ' ml of just-boiled water to the base, up to the valve.'],
+          ['Load', 'Fill the basket with about ' + fmt(c) + ' g of loose grounds, levelled off without tamping.'],
+          ['Heat', 'Put it on medium-high heat with the lid open so you can watch the coffee come up.'],
+          ['At flow', 'As soon as coffee starts to flow, turn the heat to its lowest setting.'],
+          ['If fast', 'If the coffee comes out thick and fast, take the pot off the heat completely.'],
+          ['At gurgle', 'When you hear gurgling, lift the pot, tilt it and run the base under cold water to stop the brew.']],
+        note: 'A brikka has a weighted valve that behaves differently from a plain moka pot, and these steps come from his standard moka pot routine, so treat them as a starting point and adjust the heat by eye.' }; } },
+    { id: 'iced', name: 'Immersion iced coffee', tag: 'about 75 g/L, 5:30',
+      input: { label: 'Finished drink (ml)', def: 250, min: 100, max: 1000, step: 10 },
+      build: function (t) { var c = t * 0.076, hot = t * 0.66, ice = t * 0.34; return {
+        facts: [['Grind', 'Finer end of medium, finer than pour-over'], ['Water temperature', '99°C'], ['Brewer', 'AeroPress or Clever Dripper with paper filter']],
+        rows: [['Coffee', fmt(c) + ' g'], ['Hot water', fmt(hot) + ' g'], ['Ice from the freezer', fmt(ice) + ' g']],
+        steps: [['Prep', 'Preheat the brewer here (unlike his Ultimate AeroPress) and set it on a carafe. Grind ' + fmt(c) + ' g of coffee.'],
+          ['0:00', 'Add the coffee, then ' + fmt(hot) + ' g of freshly boiled water. Stir so there are no dry pockets.'],
+          ['Seal', 'Place the plunger on top to seal the brewer.'],
+          ['5:00', 'Steep for at least 5 minutes, or 4 minutes for darker roasts.'],
+          ['Ice', 'Put ' + fmt(ice) + ' g of ice into the carafe.'],
+          ['Press', 'Press the brew through onto the ice. Stir in any ice that is left, then serve over ice.']],
+        note: 'Amounts are flexible. Ice cubes are never the same size, so do not worry about the last gram.' }; } }
+  ];
+
+  function renderRecipes() {
+    var c = RECIPES.filter(function (r) { return r.id === S.hof; })[0] || RECIPES[0];
+    $('pills').innerHTML = RECIPES.map(function (r) {
+      return '<button class="pill" type="button" data-id="' + r.id + '" aria-pressed="' + (r.id === c.id) + '">' + r.name + '</button>';
+    }).join('');
+    document.querySelectorAll('.pill').forEach(function (b) {
+      b.addEventListener('click', function () { S.hof = b.dataset.id; save(); renderRecipes(); });
+    });
+    var w = num(S.hofInputs[c.id], c.input.def);
+    var r = c.build(w);
+    $('recipe').innerHTML =
+      '<div class="rhead"><h2>' + c.name + '</h2><span class="tag">' + c.tag + '</span></div>' +
+      '<div class="row2" style="grid-template-columns:1fr 110px"><label for="rin"><strong>' + c.input.label + '</strong><br><span class="hint">Change this and everything below rescales.</span></label>' +
+      '<input class="num" id="rin" type="number" inputmode="decimal" min="' + c.input.min + '" max="' + c.input.max + '" step="' + c.input.step + '" value="' + w + '"></div>' +
+      '<div class="facts">' + r.facts.map(function (f) { return '<div class="fact"><div class="k">' + f[0] + '</div><div class="v">' + f[1] + '</div></div>'; }).join('') + '</div>' +
+      '<table class="ing2"><tbody>' + r.rows.map(function (x) { return '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>'; }).join('') + '</tbody></table>' +
+      '<ol class="tl">' + r.steps.map(function (s) { return '<li><span class="t">' + s[0] + '</span><span>' + s[1] + '</span></li>'; }).join('') + '</ol>' +
+      (r.note ? '<p class="hint">' + r.note + '</p>' : '');
+    $('rin').addEventListener('input', function (e) {
+      var v = num(e.target.value, NaN);
+      if (isFinite(v) && v > 0) {
+        S.hofInputs[c.id] = v; save();
+        var rr = c.build(v);
+        $('recipe').querySelector('table.ing2 tbody').innerHTML = rr.rows.map(function (x) { return '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>'; }).join('');
+        $('recipe').querySelector('ol.tl').innerHTML = rr.steps.map(function (s) { return '<li><span class="t">' + s[0] + '</span><span>' + s[1] + '</span></li>'; }).join('');
+        e.target.focus();
+      }
+    });
+  }
+
+  /* ---------- routing ---------- */
+  function route() {
+    var hof = location.hash === '#hoffmann';
+    $('view-calc').hidden = hof;
+    $('view-hof').hidden = !hof;
+    $('tab-calc').setAttribute('aria-current', hof ? 'false' : 'page');
+    $('tab-hof').setAttribute('aria-current', hof ? 'page' : 'false');
+    if (hof) renderRecipes(); else renderAll();
+  }
+
+  bind();
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body>
+</html>
