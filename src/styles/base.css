@@ -1,0 +1,86 @@
+/* Tokens, base elements, layout, panels, form controls. Ported as-is from the single-file app. */
+/* Layout idea: a kitchen-scale readout. Big mono numerals, a glass that fills as volume grows, honey amber as the single accent. */
+:root {
+  --bg: #eef0ec;
+  --surface: #fbfcfa;
+  --sunk: #e6e9e3;
+  --ink: #1b2427;
+  --muted: #5b676b;
+  --line: #d5dad4;
+  --accent: #e0a01b;
+  --accent-ink: #1b2427;
+  --accent-text: #8a5a00;
+  --danger: #a33a22;
+  --warn-bg: #fff3d6;
+  --warn-ink: #5c3d00;
+  --c1: #e0a01b;
+  --c2: #5a3828;
+  --c3: #8fd0e0;
+  --c4: #e8dcc2;
+  --c5: #7f9b6a;
+  --c6: #9c7490;
+  --water: #8ea2b8;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1517; --surface: #182022; --sunk: #121a1c; --ink: #e8eeee; --muted: #9aa8ab;
+    --line: #2a3639; --accent: #f0b429; --accent-ink: #14110a; --accent-text: #f0b429;
+    --danger: #e08a6c; --warn-bg: #3a2c0c; --warn-ink: #f3d9a0;
+    --c1: #f0b429; --c2: #a8745a; --c3: #6fb8cc; --c4: #cbbf9f; --c5: #86a874; --c6: #b089a4;
+    --water: #7f95ad;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1517; --surface: #182022; --sunk: #121a1c; --ink: #e8eeee; --muted: #9aa8ab;
+  --line: #2a3639; --accent: #f0b429; --accent-ink: #14110a; --accent-text: #f0b429;
+  --danger: #e08a6c; --warn-bg: #3a2c0c; --warn-ink: #f3d9a0;
+  --c1: #f0b429; --c2: #a8745a; --c3: #6fb8cc; --c4: #cbbf9f; --c5: #86a874; --c6: #b089a4;
+  --water: #7f95ad;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; margin: 0; text-wrap: balance; }
+button, input, select { font: inherit; color: inherit; }
+a { color: var(--accent-text); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.wrap { max-width: 1060px; margin: 0 auto; padding: 24px 16px 56px; }
+.top { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.mark { width: 14px; height: 38px; border-radius: 3px 3px 9px 9px; background: linear-gradient(to top, var(--c1) 0 40%, var(--c2) 40% 80%, var(--c3) 80%); flex: none; }
+h1 { font-size: clamp(26px, 5vw, 38px); font-weight: 800; letter-spacing: -0.02em; }
+.sub { margin: 0; color: var(--muted); max-width: 62ch; }
+.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); }
+.tabs a { text-decoration: none; color: var(--muted); padding: 10px 14px; font-weight: 600; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+.panel h2 { font-size: 19px; font-weight: 600; }
+.group { display: flex; flex-direction: column; gap: 10px; }
+.group + .group { border-top: 1px solid var(--line); padding-top: 16px; }
+.head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.hint { margin: 0; font-size: 13px; color: var(--muted); }
+
+.num { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-family: var(--font-mono); font-size: 15px; text-align: right; font-variant-numeric: tabular-nums; }
+.txt { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-weight: 600; }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.check input { width: 16px; height: 16px; accent-color: var(--accent); }
+.btn { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 8px 14px; cursor: pointer; font-weight: 600; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.small { padding: 5px 10px; font-size: 13px; }
+.btn.danger { color: var(--danger); }
+.btnrow { display: flex; flex-wrap: wrap; gap: 8px; }
+
+[hidden] { display: none !important; }

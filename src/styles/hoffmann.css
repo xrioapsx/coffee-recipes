@@ -1,0 +1,25 @@
+/* Hoffmann recipes view. */
+/* Hoffmann */
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 16px; cursor: pointer; font-weight: 600; }
+.pill[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.note { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 12px 14px; margin: 16px 0; }
+.note p { margin: 0; max-width: 72ch; }
+.note p + p { margin-top: 6px; }
+.rhead { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; align-items: baseline; }
+.rhead h2 { font-size: 26px; font-weight: 800; }
+.tag { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.fact { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+.fact .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.fact .v { font-weight: 600; }
+table.ing2 { width: 100%; border-collapse: collapse; }
+table.ing2 td { padding: 9px 0; border-bottom: 1px solid var(--line); }
+table.ing2 td:last-child { text-align: right; font-family: var(--font-mono); font-size: 20px; font-variant-numeric: tabular-nums; }
+table.ing2 tr:last-child td { border-bottom: 0; }
+.tl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.tl li { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.tl li:last-child { border-bottom: 0; }
+.tl .t { font-family: var(--font-mono); font-size: 13px; color: var(--accent-text); padding-top: 2px; }
+.sources { font-size: 13.5px; color: var(--muted); }
+.sources ul { margin: 6px 0 0; padding-left: 20px; }

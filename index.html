@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coffee Honey Scaler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Mono:wght@400;500&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <h1>Coffee Honey Scaler</h1>
+    </div>
+    <p class="sub">Keep your own drinks here, each with its own ingredients, and scale any of them up or down without changing how they taste. The second tab holds James Hoffmann's reference brews.</p>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#calculator" id="tab-calc">My recipes</a>
+      <a href="#hoffmann" id="tab-hof">Hoffmann recipes</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="view-calc" aria-label="My recipes">
+      <div class="grid">
+        <div class="panel">
+          <div class="group">
+            <div class="head">
+              <h2>My recipes</h2>
+              <span class="hint" id="count"></span>
+            </div>
+            <div class="rtabs" id="rtabs" role="group" aria-label="Choose a recipe"></div>
+            <div class="row2" style="grid-template-columns:minmax(0,1fr) auto">
+              <input class="txt" id="rname" aria-label="Recipe name" placeholder="Name this drink">
+              <div class="btnrow">
+                <button class="btn small" type="button" id="dup">Duplicate</button>
+                <button class="btn small danger" type="button" id="del">Delete</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="group">
+            <div class="head">
+              <h2>Ingredients</h2>
+              <span class="hint">in ml</span>
+            </div>
+            <div class="ings" id="ings"></div>
+            <button class="btn small" type="button" id="addIng">Add ingredient</button>
+            <p class="hint">Keep fixed holds an amount steady while everything else scales. Melts marks ice, so it counts toward volume but only partly toward liquid. Max caps an ingredient, and anything over it becomes water.</p>
+          </div>
+
+          <div class="group">
+            <h2>How much more?</h2>
+            <div class="chips" role="group" aria-label="Quick extra volume">
+              <button class="chip" type="button" data-extra="0">Original</button>
+              <button class="chip" type="button" data-extra="30">+30</button>
+              <button class="chip" type="button" data-extra="40">+40</button>
+              <button class="chip" type="button" data-extra="50">+50</button>
+            </div>
+            <input class="range" id="extra-range" type="range" min="-100" max="300" step="5" aria-label="Extra volume, ml">
+            <div class="row2">
+              <label for="total-input">Total volume you want (ml)</label>
+              <input class="num" id="total-input" type="number" inputmode="decimal" min="0" step="5">
+            </div>
+          </div>
+
+          <div class="group">
+            <h2>Settings for this recipe</h2>
+            <div class="row2">
+              <label for="melt-input">Ice that melts while shaking (%)<br><span class="hint">An estimate. It only affects the liquid and share figures.</span></label>
+              <input class="num" id="melt-input" type="number" inputmode="decimal" min="0" max="80" step="5">
+            </div>
+            <label class="check" for="round5"><input type="checkbox" id="round5">Round amounts to 5 ml</label>
+          </div>
+        </div>
+
+        <div class="panel" aria-live="polite">
+          <div class="readout">
+            <span class="big" id="out-total">250</span><span class="unit">ml</span>
+            <span class="delta" id="out-delta">+40 ml</span>
+          </div>
+          <p class="hint" id="out-name"></p>
+
+          <div class="viz">
+            <div class="glass-wrap" role="img" aria-label="Glass showing the volume of each ingredient" id="glass-wrap">
+              <div class="glass" id="glass"></div>
+              <div class="marker" id="marker"><span id="marker-label">original</span></div>
+            </div>
+            <div class="list" id="list"></div>
+          </div>
+
+          <div class="warns" id="warns"></div>
+          <div class="stats" id="stats"></div>
+
+          <div class="group">
+            <h2>Balance</h2>
+            <div class="shares" id="shares"></div>
+            <p class="hint">Each ingredient as a share of the liquid in the glass, with the original in brackets. Matching numbers mean the taste holds.</p>
+          </div>
+
+          <div class="group">
+            <h2>Method</h2>
+            <ol class="steps">
+              <li>Stir any honey or syrup into the warm coffee until it dissolves. Cold honey sticks to the shaker.</li>
+              <li>Add the ice and shake until the shaker is frosty on the outside.</li>
+              <li>Strain into a glass, over fresh ice if you like.</li>
+            </ol>
+            <div class="btnrow">
+              <button class="btn primary" type="button" id="copy">Copy recipe</button>
+            </div>
+            <p class="hint" id="copy-status" role="status"></p>
+            <textarea class="copybox" id="copybox" readonly hidden aria-label="Recipe text"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-hof" aria-label="Hoffmann recipes" hidden>
+      <div class="note">
+        <p><strong>Closest to a shaken iced drink: the immersion iced coffee.</strong> Hoffmann brews strong coffee hot and presses it straight onto ice, so the melting ice does the diluting. A shaker works the same way, which is why the calculator counts ice melt.</p>
+        <p>Pick a recipe, then change the water to scale everything else in it.</p>
+      </div>
+      <div class="pills" id="pills" role="group" aria-label="Recipes"></div>
+      <div class="panel" id="recipe" style="margin-top:16px"></div>
+      <div class="sources" style="margin-top:18px">
+        <strong>Where these numbers come from.</strong> Written-up versions of Hoffmann's videos, so check the original video when a detail matters.
+        <ul>
+          <li><a href="https://gist.github.com/fluency03/7fb305b8110dde5739d14697af97a99a" target="_blank" rel="noopener">Ultimate V60 Technique (gist)</a> and <a href="https://www.hario-usa.com/blogs/recipes-and-more-from-friends/james-hoffmann-uitimate-v60-technique" target="_blank" rel="noopener">Hario USA</a></li>
+          <li><a href="https://gist.github.com/fluency03/a494eed7504c8f2b3a162a84f3941168" target="_blank" rel="noopener">Ultimate AeroPress Technique (gist)</a></li>
+          <li><a href="https://honestcoffeeguide.com/brew-recipes/james-hoffmann-french-press/" target="_blank" rel="noopener">French press recipe, Honest Coffee Guide</a></li>
+          <li><a href="https://huffingtonpost.co.uk/entry/james-hoffmann-moka-pot-coffee-routine_uk_673b1cc9e4b0ebe12e36b57d" target="_blank" rel="noopener">Moka pot routine, HuffPost UK</a></li>
+          <li><a href="https://aeroprecipe.com/recipes/james-hoffman-immersion-iced-coffee" target="_blank" rel="noopener">Immersion iced coffee, AeroPrecipe</a> and <a href="https://sprudge.com/summer-brew-methods-james-hoffmann-katie-carguilo-bust-out-the-slip-n-slide-3817.html" target="_blank" rel="noopener">Sprudge</a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
