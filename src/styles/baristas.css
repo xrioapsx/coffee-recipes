@@ -1,4 +1,4 @@
-/* Hoffmann recipes view. */
+/* Barista recipes view. */
 /* Hoffmann */
 .pills { display: flex; flex-wrap: wrap; gap: 8px; }
 .pill { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 16px; cursor: pointer; font-weight: 600; }
@@ -23,3 +23,11 @@ table.ing2 tr:last-child td { border-bottom: 0; }
 .tl .t { font-family: var(--font-mono); font-size: 13px; color: var(--accent-text); padding-top: 2px; }
 .sources { font-size: 13.5px; color: var(--muted); }
 .sources ul { margin: 6px 0 0; padding-left: 20px; }
+
+/* barista switcher */
+.baristas { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+.barista { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 14px; cursor: pointer; min-width: 0; }
+.barista .bn { font-family: var(--font-display); font-weight: 600; font-size: 16px; }
+.barista .bt { font-size: 12.5px; color: var(--muted); }
+.barista[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.barista[aria-pressed="true"] .bt { color: inherit; opacity: 0.75; }

@@ -15,10 +15,10 @@
       <span class="mark" aria-hidden="true"></span>
       <h1>Coffee Honey Scaler</h1>
     </div>
-    <p class="sub">Keep your own drinks here, each with its own ingredients, and scale any of them up or down without changing how they taste. The second tab holds James Hoffmann's reference brews.</p>
+    <p class="sub">Keep your own drinks here, each with its own ingredients, and scale any of them up or down without changing how they taste. The second tab holds reference brews from well-known baristas, grouped by who made them.</p>
     <nav class="tabs" aria-label="Sections">
       <a href="#calculator" id="tab-calc">My recipes</a>
-      <a href="#hoffmann" id="tab-hof">Hoffmann recipes</a>
+      <a href="#baristas" id="tab-hof">Barista recipes</a>
     </nav>
   </header>
 
@@ -117,23 +117,12 @@
       </div>
     </section>
 
-    <section id="view-hof" aria-label="Hoffmann recipes" hidden>
-      <div class="note">
-        <p><strong>Closest to a shaken iced drink: the immersion iced coffee.</strong> Hoffmann brews strong coffee hot and presses it straight onto ice, so the melting ice does the diluting. A shaker works the same way, which is why the calculator counts ice melt.</p>
-        <p>Pick a recipe, then change the water to scale everything else in it.</p>
-      </div>
+    <section id="view-hof" aria-label="Barista recipes" hidden>
+      <div class="baristas" id="baristas" role="group" aria-label="Baristas"></div>
+      <div class="note" id="barista-intro"></div>
       <div class="pills" id="pills" role="group" aria-label="Recipes"></div>
       <div class="panel" id="recipe" style="margin-top:16px"></div>
-      <div class="sources" style="margin-top:18px">
-        <strong>Where these numbers come from.</strong> Written-up versions of Hoffmann's videos, so check the original video when a detail matters.
-        <ul>
-          <li><a href="https://gist.github.com/fluency03/7fb305b8110dde5739d14697af97a99a" target="_blank" rel="noopener">Ultimate V60 Technique (gist)</a> and <a href="https://www.hario-usa.com/blogs/recipes-and-more-from-friends/james-hoffmann-uitimate-v60-technique" target="_blank" rel="noopener">Hario USA</a></li>
-          <li><a href="https://gist.github.com/fluency03/a494eed7504c8f2b3a162a84f3941168" target="_blank" rel="noopener">Ultimate AeroPress Technique (gist)</a></li>
-          <li><a href="https://honestcoffeeguide.com/brew-recipes/james-hoffmann-french-press/" target="_blank" rel="noopener">French press recipe, Honest Coffee Guide</a></li>
-          <li><a href="https://huffingtonpost.co.uk/entry/james-hoffmann-moka-pot-coffee-routine_uk_673b1cc9e4b0ebe12e36b57d" target="_blank" rel="noopener">Moka pot routine, HuffPost UK</a></li>
-          <li><a href="https://aeroprecipe.com/recipes/james-hoffman-immersion-iced-coffee" target="_blank" rel="noopener">Immersion iced coffee, AeroPrecipe</a> and <a href="https://sprudge.com/summer-brew-methods-james-hoffmann-katie-carguilo-bust-out-the-slip-n-slide-3817.html" target="_blank" rel="noopener">Sprudge</a></li>
-        </ul>
-      </div>
+      <div class="sources" id="sources" style="margin-top:18px"></div>
     </section>
   </main>
 </div>

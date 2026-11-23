@@ -1,11 +1,12 @@
 # Coffee Honey Scaler
 
 Keep your own drinks, each with its own ingredients, and scale any of them up or
-down without changing how they taste. A second tab holds James Hoffmann's
-reference brew recipes.
+down without changing how they taste. A second tab holds reference brew
+recipes from well-known baristas (James Hoffmann, Tetsu Kasuya, Scott Rao,
+Matt Winton), grouped by barista.
 
-Calculator amounts are in **ml** (measured with a jigger); the Hoffmann recipes
-are in **grams**, as he gives them. That mismatch is on purpose.
+Calculator amounts are in **ml** (measured with a jigger); the barista recipes
+are in **grams**, as they give them. That mismatch is on purpose.
 
 ## Commands
 
@@ -26,10 +27,10 @@ index.html               markup (from the original single-file app)
 src/compute.ts           the scaling algorithm, a pure function
 src/state.ts             schema, load/save, v1 → v2 migration
 src/calculator.ts        "My recipes" view
-src/hoffmann-recipes.ts  Hoffmann recipe data: add recipes here
-src/hoffmann-view.ts     "Hoffmann recipes" view
+src/baristas.ts          barista recipe data, grouped by barista: add recipes here
+src/barista-view.ts      "Barista recipes" view
 src/styles/*.css         the original CSS, split by section
-tests/                   Vitest: compute vectors, parity, state
+tests/                   Vitest: compute vectors, parity, state, barista data
 reference/index.html     the original single-file app, kept as the behaviour reference
 docs/HANDOFF.md          the full spec: data model, algorithm, test vectors, design
 ```
