@@ -32,6 +32,15 @@
               <span class="hint" id="count"></span>
             </div>
             <div class="rtabs" id="rtabs" role="group" aria-label="Choose a recipe"></div>
+            <div class="borrow" id="borrow" hidden>
+              <label for="borrow-pick"><strong>Borrow a barista's recipe</strong><br><span class="hint">It lands here as your own copy to change. The barista's version stays as it was.</span></label>
+              <select class="txt" id="borrow-pick"></select>
+              <div class="btnrow">
+                <button class="btn small primary" type="button" id="borrow-go">Make it mine</button>
+                <button class="btn small" type="button" id="borrow-cancel">Cancel</button>
+              </div>
+            </div>
+            <p class="hint" id="borrow-status" role="status"></p>
             <div class="row2" style="grid-template-columns:minmax(0,1fr) auto">
               <input class="txt" id="rname" aria-label="Recipe name" placeholder="Name this drink">
               <div class="btnrow">

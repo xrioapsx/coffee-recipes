@@ -6,6 +6,8 @@
  * and text fields are never written to while they hold focus.
  */
 import { compute, type Ingredient, type Recipe } from './compute';
+import { BARISTAS } from './baristas';
+import { borrow, borrowable, leftOut } from './borrow';
 import { newIngredient, newRecipe, type AppState } from './state';
 import { $, esc, num, uid } from './util';
 
@@ -26,17 +28,27 @@ export function createCalculator(S: AppState, save: () => void) {
             '<button class="rtab" type="button" data-id="' + esc(r.id) + '" aria-pressed="' +
             (r.id === S.currentId) + '">' + esc(r.name || 'Untitled') + '</button>',
         )
-        .join('') + '<button class="rtab add" type="button" id="newRecipe">+ New recipe</button>';
+        .join('') +
+      '<button class="rtab add" type="button" id="newRecipe">+ New recipe</button>' +
+      '<button class="rtab add" type="button" id="borrowOpen" aria-expanded="' + !$('borrow').hidden + '">+ From a barista</button>';
     $('rtabs')
       .querySelectorAll<HTMLButtonElement>('.rtab[data-id]')
       .forEach((b) => {
         b.addEventListener('click', () => {
+          status('');
           S.currentId = b.dataset.id!;
           save();
           renderAll();
         });
       });
+    $('borrowOpen').addEventListener('click', () => {
+      const box = $('borrow');
+      box.hidden = !box.hidden;
+      $('borrowOpen').setAttribute('aria-expanded', String(!box.hidden));
+      if (!box.hidden) $('borrow-pick').focus();
+    });
     $('newRecipe').addEventListener('click', () => {
+      status('');
       const r = newRecipe();
       S.recipes.push(r);
       S.currentId = r.id;
@@ -228,6 +240,31 @@ export function createCalculator(S: AppState, save: () => void) {
     return '<div class="stat"><div class="k">' + k + '</div><div class="v">' + v + '</div><div class="n">' + n + '</div></div>';
   }
 
+  function status(text: string) {
+    $('borrow-status').textContent = text;
+  }
+
+  /**
+   * Add a copy of a barista recipe after the current one and switch to it.
+   * `input` is the milk or water amount from the barista page, if any.
+   */
+  function adopt(recipeId: string, input?: number) {
+    const b = BARISTAS.find((x) => x.recipes.some((r) => r.id === recipeId));
+    const src = b && b.recipes.find((r) => r.id === recipeId);
+    if (!b || !src) return;
+    const r = borrow(src, b.name, input);
+    S.recipes.splice(S.recipes.indexOf(cur()) + 1, 0, r);
+    S.currentId = r.id;
+    save();
+    $('borrow').hidden = true;
+    renderAll();
+    const left = leftOut(src, input);
+    status(
+      'Added ' + r.name + '. It is yours now, so change anything you like.' +
+        (left.length ? ' Not copied, since they have no ml amount: ' + left.join(', ') + '.' : ''),
+    );
+  }
+
   function renderAll() {
     renderTabs();
     renderIngredients();
@@ -249,6 +286,19 @@ export function createCalculator(S: AppState, save: () => void) {
   /* ---------- static controls, bound once ---------- */
 
   function bind() {
+    $('borrow-pick').innerHTML = borrowable()
+      .map(
+        (g) =>
+          '<optgroup label="' + esc(g.barista) + '">' +
+          g.recipes.map((r) => '<option value="' + esc(r.id) + '">' + esc(r.name) + '</option>').join('') +
+          '</optgroup>',
+      )
+      .join('');
+    $('borrow-go').addEventListener('click', () => adopt($<HTMLSelectElement>('borrow-pick').value));
+    $('borrow-cancel').addEventListener('click', () => {
+      $('borrow').hidden = true;
+      $('borrowOpen').setAttribute('aria-expanded', 'false');
+    });
     $<HTMLInputElement>('rname').addEventListener('input', (e) => {
       const v = (e.target as HTMLInputElement).value;
       cur().name = v;
@@ -348,5 +398,5 @@ export function createCalculator(S: AppState, save: () => void) {
     });
   }
 
-  return { bind, renderAll };
+  return { bind, renderAll, adopt };
 }

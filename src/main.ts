@@ -11,7 +11,10 @@ const S = load(storage);
 const save = () => saveState(storage, S);
 
 const calculator = createCalculator(S, save);
-const baristas = createBaristaView(S, save);
+const baristas = createBaristaView(S, save, (id, input) => {
+  calculator.adopt(id, input);
+  location.hash = '#calculator';
+});
 
 /** Two views routed on the URL hash: #calculator (default) and #baristas (#hoffmann still works). */
 function route() {

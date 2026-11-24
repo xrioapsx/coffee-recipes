@@ -10,7 +10,8 @@ const rowsHtml = (b: BrewBuild) => b.rows.map((x) => '<tr><td>' + x[0] + '</td><
 const stepsHtml = (b: BrewBuild) =>
   b.steps.map((s) => '<li><span class="t">' + s[0] + '</span><span>' + s[1] + '</span></li>').join('');
 
-export function createBaristaView(S: AppState, save: () => void) {
+/** `makeMine` copies a recipe into My recipes at the given input amount. */
+export function createBaristaView(S: AppState, save: () => void, makeMine: (id: string, input: number) => void) {
   function render() {
     // The saved selection is a recipe id; the barista is whoever owns it.
     const barista = baristaOf(S.hof);
@@ -66,6 +67,8 @@ export function createBaristaView(S: AppState, save: () => void) {
       '<div class="facts">' +
       r.facts.map((f) => '<div class="fact"><div class="k">' + f[0] + '</div><div class="v">' + f[1] + '</div></div>').join('') +
       '</div>' +
+      '<div class="btnrow" style="margin:4px 0 12px"><button class="btn small primary" type="button" id="mine">Make it mine</button>' +
+      '<span class="hint" style="align-self:center">Copies it to My recipes, at this amount, for you to change.</span></div>' +
       '<table class="ing2"><tbody id="r-rows">' + rowsHtml(r) + '</tbody></table>' +
       '<ol class="tl" id="r-steps">' + stepsHtml(r) + '</ol>' +
       (r.note ? '<p class="hint">' + r.note + '</p>' : '') +
@@ -77,6 +80,7 @@ export function createBaristaView(S: AppState, save: () => void) {
             '<ol class="steps">' + s.steps.map((t) => '<li>' + t + '</li>').join('') + '</ol></div>',
         )
         .join('');
+    $('mine').addEventListener('click', () => makeMine(c.id, num(S.hofInputs[c.id], c.input.def)));
     $('rin').addEventListener('input', (e) => {
       const v = num((e.target as HTMLInputElement).value, NaN);
       if (isFinite(v) && v > 0) {

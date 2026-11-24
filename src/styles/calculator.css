@@ -60,3 +60,8 @@
 .warn { background: var(--warn-bg); color: var(--warn-ink); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
 ol.steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
 textarea.copybox { width: 100%; min-height: 120px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-family: var(--font-mono); font-size: 13px; color: var(--ink); }
+
+/* Borrow a barista recipe */
+.borrow { display: grid; gap: 8px; margin-top: 10px; padding: 12px; border: 1px dashed var(--line); border-radius: 10px; }
+.borrow select { width: 100%; }
+#borrow-status:empty { display: none; }
